@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+<html lang="te" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>తెలుగు సాహితి సమితి - ప్రత్యక్ష సభా వేదిక (Live Hall)</title>
+  
+  <!-- Favicon & Meta Tags -->
+  <link rel="icon" type="image/jpeg" href="logo.jpg" />
+  <meta name="description" content="తెలుగు సాహితి సమితి - ART IS HARMONY. ప్రత్యక్ష సభా వేదిక • 200+ మంది సభ్యులు ఏకకాలంలో పాల్గొనే వేదిక." />
+  <meta property="og:title" content="తెలుగు సాహితి సమితి - ప్రత్యక్ష సభా వేదిక" />
+  <meta property="og:description" content="తెలుగు సాహితి సమితి సభలో ప్రత్యక్షంగా పాల్గొనండి! Developed by Nalluru Hemesh, Head of KALAM cluster, TSS." />
+  <meta property="og:image" content="logo.jpg" />
+
+  <!-- Mobile Ergonomics: Touch & Fullscreen handling -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Telugu & Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Suranna&family=Tenali+Ramakrishna&display=swap" rel="stylesheet">
+
+  <!-- Embedded Logo Fallback Data -->
+  <script src="logo_data.js"></script>
+
+  <!-- High-Scale Real-Time Libraries: MQTT for 200+ multi-network sync, QRCode, Confetti -->
+  <script src="https://unpkg.com/mqtt@5.3.5/dist/mqtt.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            samithi: {
+              navy: '#18233e',
+              deepnavy: '#0b1324',
+              gold: '#c69443',
+              goldlight: '#e5b869',
+              golddark: '#9a6f27',
+              olive: '#7b6818',
+              cream: '#faf8f2',
+              creamdark: '#f3ede0',
+              border: '#ebdcc5'
+            }
+          },
+          fontFamily: {
+            telugu: ['"Noto Sans Telugu"', 'sans-serif'],
+            telugucalligraphy: ['"Tenali Ramakrishna"', '"Suranna"', 'serif'],
+            classic: ['"Outfit"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+    }
+
+    body {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* iOS font zoom prevention: input font-size >= 16px */
+    input, textarea, select {
+      font-size: 16px !important;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.04); }
+    ::-webkit-scrollbar-thumb { background: rgba(198, 148, 67, 0.45); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(198, 148, 67, 0.8); }
+
+    /* High-Performance Particle Engine (GPU accelerated) */
+    @keyframes stageFloatUp {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 20px, 0) scale(0.6) rotate(0deg);
+      }
+      15% {
+        opacity: 1;
+        transform: translate3d(0, -20px, 0) scale(1.25) rotate(-6deg);
+      }
+      75% {
+        opacity: 0.95;
+        transform: translate3d(var(--drift-x, 0px), -240px, 0) scale(1.1) rotate(6deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(var(--drift-x, 0px), -360px, 0) scale(0.8) rotate(-10deg);
+      }
+    }
+
+    .reaction-particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      will-change: transform, opacity;
+      animation: stageFloatUp 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes validationShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .shake-error {
+      animation: validationShake 0.4s ease-in-out;
+    }
+
+    @keyframes smoothPop {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .animate-pop {
+      animation: smoothPop 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .touch-target {
+      min-height: 48px;
+      min-width: 48px;
+    }
+
+    .transition-width {
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+
+<body class="bg-samithi-cream text-slate-800 font-telugu min-h-full flex flex-col antialiased selection:bg-samithi-gold selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- DEVELOPER & LEADERSHIP ATTRIBUTION BADGE (TOP CORNER) -->
+  <!-- ========================================================================= -->
+  <aside class="fixed top-2.5 left-2.5 sm:top-3 sm:left-4 z-30 pointer-events-auto">
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-samithi-gold/60 shadow-md hover:shadow-lg transition text-[11px] font-telugu text-slate-800 animate-pop">
+      <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+      <span class="font-medium">
+        Developed by <strong class="font-bold text-samithi-navy">Nalluru Hemesh</strong>, 
+        <span class="text-slate-600 font-classic font-semibold">Head of KALAM cluster, TSS</span>
+      </span>
+    </div>
+  </aside>
+
+  <!-- Floating Reaction Particles Canvas Container -->
+  <div id="floatingReactionsContainer" class="fixed inset-0 pointer-events-none z-50 overflow-hidden" aria-hidden="true"></div>
+
+  <!-- Toast Notifications Container -->
+  <div id="toastContainer" class="fixed top-12 right-3 sm:top-5 sm:right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <!-- Global Announcement Banner (Admin Broadcast to 200+ Phones Across Networks) -->
+  <div id="globalAnnouncementBanner" class="hidden fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-amber-600 via-samithi-gold to-amber-600 text-white px-4 py-2.5 shadow-lg border-b border-amber-300/40 text-center font-telugu text-xs sm:text-sm font-bold flex items-center justify-between gap-3 animate-pop">
+    <div class="flex items-center gap-2 mx-auto truncate">
+      <span class="text-base animate-bounce">📢</span>
+      <span id="announcementText" class="truncate">సభా ప్రకటన</span>
+    </div>
+    <button onclick="dismissAnnouncement()" class="p-1 hover:bg-black/20 rounded-lg text-white/90 text-sm">✕</button>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 1. ENTRY SCREEN (మొబైల్ ప్రవేశ ద్వారం - OPTIMIZED FOR ANDROID & iOS) -->
+  <!-- ========================================================================= -->
+  <section id="entryScreen" class="min-h-screen flex flex-col justify-between p-4 sm:p-6 max-w-md mx-auto w-full transition-all duration-300 pt-14 sm:pt-16">
+    
+    <div class="my-auto space-y-4 text-center pt-2">
+      <!-- High-Fidelity Official Telugu Sahithi Samithi Emblem -->
+      <div class="flex justify-center">
+        <div id="entryLogoHolder" class="relative group cursor-pointer transition transform hover:scale-105 duration-300">
+          <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-full shadow-2xl p-1 bg-gradient-to-tr from-samithi-golddark via-samithi-goldlight to-samithi-gold ring-4 ring-samithi-gold/20">
+            <div id="mainLogoGraphic" class="w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center border-2 border-white shadow-inner">
+              <img 
+                id="entryLogoImg"
+                src="logo.jpg" 
+                alt="తెలుగు సాహితి సమితి" 
+                class="w-full h-full object-cover rounded-full"
+                onerror="if(typeof TSS_DEFAULT_LOGO !== 'undefined') this.src = TSS_DEFAULT_LOGO;"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Title & Motto -->
+      <div>
+        <h1 class="font-telugucalligraphy font-black text-3xl sm:text-4xl text-slate-900 tracking-wide leading-tight">
+          తెలుగు సాహితి సమితి
+        </h1>
+        <p class="font-classic text-xs text-samithi-gold font-bold tracking-[0.25em] uppercase mt-1">
+          ART IS HARMONY
+        </p>
+        
+        <!-- Live Real-Time Multi-Network Counters Pill (Audience & Responses) -->
+        <div class="mt-2.5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-bold border transition-colors duration-300 bg-white/80 border-emerald-300/80 shadow-2xs" id="entryNetworkPill">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="entryNetworkDot"></span>
+          <span class="text-emerald-900 font-telugu">
+            లైవ్ ప్రేక్షకులు: <strong id="entryLiveAudienceCount" class="font-mono text-emerald-700">1</strong> • 
+            స్పందనలు: <strong id="entryLiveResponsesCount" class="font-mono text-amber-800">0</strong>
+          </span>
+        </div>
+      </div>
+
+      <!-- Social Links (Instagram & WhatsApp) -->
+      <div class="flex flex-col gap-2 pt-0.5">
+        <!-- WhatsApp Community Button -->
+        <a href="https://chat.whatsapp.com/JzBx3z1nr5F0fOXi7YidNl?s=cl&p=a&ilr=4" target="_blank" rel="noopener noreferrer"
+           class="touch-target w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold text-white bg-[#25D366] hover:bg-[#20bd5a] shadow-sm hover:shadow-md transition active:scale-[0.98]">
+          <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+          </svg>
+          <span>Join our WhatsApp Community</span>
+        </a>
+
+        <!-- Instagram Follow Button -->
+        <a href="https://www.instagram.com/telugu_sahithi_samithi/" target="_blank" rel="noopener noreferrer"
+           class="touch-target w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold text-white bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] shadow-sm hover:shadow-md transition active:scale-[0.98]">
+          <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+          <span>Follow us on instagram</span>
+        </a>
+      </div>
+
+      <!-- Mobile Participant Form -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-xl border border-samithi-border text-left relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-samithi-golddark via-samithi-gold to-samithi-navy"></div>
+        
+        <label for="userNameInput" class="block font-telugu font-bold text-slate-800 text-sm mb-1.5">
+          మీ పేరు <span class="text-rose-600 font-bold">*</span> (తప్పనిసరి)
+        </label>
+        
+        <input 
+          type="text" 
+          id="userNameInput" 
+          placeholder="ఉదా: హేమేష్ లేదా సూర్య లేదా ఆదిత్య..." 
+          class="touch-target w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-slate-800 font-telugu text-base focus:bg-white focus:border-samithi-gold focus:ring-4 focus:ring-samithi-gold/20 outline-none transition"
+          maxlength="40"
+          autocomplete="name"
+          onkeydown="if(event.key === 'Enter') enterHall();"
+        />
+
+        <!-- Validation Error Message -->
+        <div id="nameValidationAlert" class="hidden mt-2.5 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
+          <span>⚠️</span>
+          <span>సభలోకి ప్రవేశించడానికి దయచేసి మీ పేరు నమోదు చేయండి (పేరు తప్పనిసరి).</span>
+        </div>
+
+        <p class="text-[11px] text-slate-500 mt-2 font-telugu leading-relaxed">
+          💡 వేర్వేరు నెట్‌వర్క్‌ల (Jio, Airtel, Wi-Fi) నుండి 200+ మందితో పాటు మీ ఆలోచనలు, కవితలు నిర్వాహకులకు మీ పేరుతో చేరుతాయి.
+        </p>
+
+        <!-- Touch-Friendly Direct Enter Button -->
+        <button 
+          onclick="enterHall()" 
+          id="enterHallBtn"
+          class="touch-target mt-4 w-full py-3.5 px-6 bg-gradient-to-r from-samithi-navy to-slate-900 text-white rounded-2xl font-telugu font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 border border-samithi-gold/40 active:scale-[0.98]">
+          <span>సభలోకి ప్రవేశించండి (Enter)</span>
+          <span class="text-xl">✍️</span>
+        </button>
+
+        <!-- Quick Admin Link & QR Code Trigger -->
+        <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-telugu">
+          <button onclick="openQrModal()" class="touch-target py-1 text-slate-600 hover:text-samithi-navy font-bold flex items-center gap-1">
+            <span>📲 సభ QR కోడ్</span>
+          </button>
+
+          <button onclick="promptAdminLogin()" class="touch-target py-1 text-samithi-golddark hover:text-samithi-navy font-bold flex items-center gap-1 hover:underline">
+            <span>నిర్వాహకుల ప్రవేశం (Admin)</span>
+            <span>🔐</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Password-Protected Logo Uploader at the Very Bottom of Entry Screen -->
+    <div class="pt-4 pb-2 text-center border-t border-samithi-border/60 flex flex-col items-center gap-1.5">
+      <button onclick="promptLogoSettings()" class="touch-target inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-500 hover:text-samithi-golddark bg-white/80 hover:bg-white border border-slate-200 shadow-2xs transition active:scale-95">
+        <span>⚙️</span>
+        <span>లోగో సెట్టింగ్స్ (పాస్‌వర్డ్ అవసరం)</span>
+      </button>
+      <p class="text-[10px] text-slate-400 font-classic">
+        © తెలుగు సాహితి సమితి • Art Is Harmony • Live Synchronized Portal
+      </p>
+    </div>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 2. AUDIENCE INTERACTIVE SCREEN (MOBILE-FIRST FOR ANDROID & iOS) -->
+  <!-- ========================================================================= -->
+  <section id="audienceScreen" class="hidden min-h-screen flex flex-col max-w-md mx-auto w-full p-3 sm:p-4 pb-24 transition-all duration-300 pt-14">
+    
+    <!-- Mobile App Top Bar -->
+    <header class="bg-white rounded-3xl p-3 sm:p-3.5 shadow-sm border border-samithi-border flex items-center justify-between gap-2.5 mb-3 sticky top-14 z-20 backdrop-blur-md bg-white/95">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-11 h-11 rounded-full overflow-hidden border-2 border-samithi-gold shadow-2xs shrink-0 logo-sync-target bg-white">
+          <img src="logo.jpg" alt="TSS" class="w-full h-full object-cover" onerror="if(typeof TSS_DEFAULT_LOGO !== 'undefined') this.src = TSS_DEFAULT_LOGO;" />
+        </div>
+        <div class="truncate">
+          <h2 class="font-telugucalligraphy font-bold text-base text-slate-900 leading-tight truncate">
+            తెలుగు సాహితి సమితి
+          </h2>
+          <div class="flex items-center gap-1 text-[11px] text-slate-500 font-telugu truncate">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <span id="displayUserName" class="text-emerald-700 font-bold truncate">సభ్యులు</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 shrink-0">
+        <!-- Live Interacting Audience Counter Pill -->
+        <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-xl text-xs font-bold font-mono flex items-center gap-1" title="ప్రత్యక్ష ప్రేక్షకుల సంఖ్య">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="liveParticipantsCounter">1</span>
+          <span class="text-[10px] font-telugu text-emerald-600 hidden sm:inline">లైవ్</span>
+        </div>
+
+        <!-- Total Responses Counter Pill -->
+        <div class="bg-amber-50 text-samithi-golddark border border-amber-200 px-2.5 py-1 rounded-xl text-xs font-bold font-mono flex items-center gap-1" title="మొత్తం స్పందనలు">
+          <span>💬</span>
+          <span id="audienceTotalCounter">0</span>
+        </div>
+
+        <!-- Leave Button -->
+        <button onclick="leaveHall()" class="touch-target p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition flex items-center justify-center" title="సభ నుండి నిష్క్రమించు">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Interactive Content -->
+    <main class="space-y-3.5 flex-1">
+
+      <!-- LIVE POLL CARD -->
+      <div id="audiencePollContainer" class="hidden bg-gradient-to-br from-amber-50 via-white to-amber-50/60 rounded-3xl p-4 sm:p-5 shadow-sm border-2 border-samithi-gold animate-pop">
+        <div class="flex items-center justify-between mb-2">
+          <span class="px-2.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider font-classic flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+            LIVE AUDIENCE POLL
+          </span>
+          <span id="pollStatusBadge" class="text-[11px] font-bold text-amber-800 font-telugu">ఓటింగ్ ప్రారంభమైంది</span>
+        </div>
+        
+        <h3 id="audiencePollQuestion" class="font-telugucalligraphy font-bold text-lg sm:text-xl text-slate-900 mb-3 leading-snug">
+          పోల్ ప్రశ్న ఇక్కడ కనిపిస్తుంది...
+        </h3>
+
+        <div id="audiencePollOptions" class="space-y-2">
+          <!-- Populated dynamically -->
+        </div>
+
+        <p id="pollVotedNotice" class="hidden text-center text-xs font-bold text-emerald-700 font-telugu mt-3 bg-emerald-50 py-1.5 rounded-xl border border-emerald-200">
+          ✓ మీ ఓటు విజయవంతంగా నమోదయింది!
+        </p>
+      </div>
+
+      <!-- Thought Composer Box -->
+      <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-samithi-border">
+        <div class="flex items-center justify-between mb-2">
+          <label for="thoughtInput" class="font-telugu font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+            <span class="text-samithi-gold">✍️</span>
+            <span>మీ ఆలోచన లేదా కవితను పంచుకోండి:</span>
+          </label>
+          <span id="charCountLabel" class="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+            0 / 300
+          </span>
+        </div>
+
+        <!-- Category Selector Tags for Clean Audience Structuring -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2 font-telugu text-xs">
+          <button type="button" onclick="selectThoughtCategory('సాధారణం')" class="category-pill active px-3 py-1 rounded-xl font-bold bg-samithi-navy text-white text-[11px] whitespace-nowrap transition" data-category="సాధారణం">
+            💭 సాధారణం
+          </button>
+          <button type="button" onclick="selectThoughtCategory('కవిత')" class="category-pill px-3 py-1 rounded-xl font-bold bg-slate-100 text-slate-600 text-[11px] whitespace-nowrap transition" data-category="కవిత">
+            📜 కవిత
+          </button>
+          <button type="button" onclick="selectThoughtCategory('ప్రశ్న')" class="category-pill px-3 py-1 rounded-xl font-bold bg-slate-100 text-slate-600 text-[11px] whitespace-nowrap transition" data-category="ప్రశ్న">
+            ❓ ప్రశ్న
+          </button>
+          <button type="button" onclick="selectThoughtCategory('ప్రశంస')" class="category-pill px-3 py-1 rounded-xl font-bold bg-slate-100 text-slate-600 text-[11px] whitespace-nowrap transition" data-category="ప్రశంస">
+            🌟 ప్రశంస
+          </button>
+          <button type="button" onclick="selectThoughtCategory('కళ/నాటకం')" class="category-pill px-3 py-1 rounded-xl font-bold bg-slate-100 text-slate-600 text-[11px] whitespace-nowrap transition" data-category="కళ/నాటకం">
+            🎭 కళ/నాటకం
+          </button>
+        </div>
+
+        <textarea 
+          id="thoughtInput" 
+          rows="3" 
+          maxlength="300"
+          placeholder="మీ ఆలోచనలు, కవిత లేదా ప్రశ్నను ఇక్కడ టైప్ చేయండి..."
+          class="w-full p-3.5 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:bg-white focus:border-samithi-gold focus:ring-4 focus:ring-samithi-gold/20 outline-none text-slate-800 font-telugu text-base leading-relaxed transition resize-none mb-3"
+          oninput="updateCharCount()"
+        ></textarea>
+
+        <!-- Submit Button with Anti-Spam & Anti-Duplicate Protection -->
+        <button onclick="submitThoughtToHall()" id="publishThoughtBtn"
+          class="touch-target w-full py-3.5 px-4 bg-gradient-to-r from-samithi-navy to-slate-900 text-white rounded-2xl font-telugu font-bold text-base shadow-md transition flex items-center justify-center gap-2 border border-samithi-gold/50 active:scale-[0.98]">
+          <span id="publishBtnText">సభకు పంపించండి (Submit Response)</span>
+          <span class="text-amber-300 text-lg">✍️</span>
+        </button>
+      </div>
+
+      <!-- MOBILE THUMB-FRIENDLY REACTION DOCK (THROTTLED FOR 200+ SCALE) -->
+      <div class="bg-white rounded-3xl p-3 border border-samithi-border shadow-2xs">
+        <div class="flex items-center justify-between mb-2 px-1 font-telugu">
+          <span class="text-xs font-bold text-slate-800">ప్రత్యక్ష స్పందనలు (Live Emojis):</span>
+          <span class="text-[10px] text-slate-400">వేదిక తెరపైకి ఎగురుతాయి</span>
+        </div>
+        <div class="grid grid-cols-6 sm:grid-cols-11 gap-1.5 justify-items-center">
+          <button onclick="triggerAudienceReaction('♥️')" class="touch-target w-full aspect-square text-xl bg-rose-50 hover:bg-rose-100 border border-rose-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs" title="Heart">♥️</button>
+          <button onclick="triggerAudienceReaction('✨')" class="touch-target w-full aspect-square text-xl bg-amber-50 hover:bg-amber-100 border border-amber-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs" title="Sparkles">✨</button>
+          <button onclick="triggerAudienceReaction('👏')" class="touch-target w-full aspect-square text-xl bg-amber-50 hover:bg-amber-100 border border-amber-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs" title="Clap">👏</button>
+          <button onclick="triggerAudienceReaction('🤩')" class="touch-target w-full aspect-square text-xl bg-yellow-50 hover:bg-yellow-100 border border-yellow-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs" title="Star-Struck">🤩</button>
+          <button onclick="triggerAudienceReaction('👍')" class="touch-target w-full aspect-square text-xl bg-blue-50 hover:bg-blue-100 border border-blue-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs" title="Thumbs Up">👍</button>
+          <button onclick="triggerAudienceReaction('😊')" class="touch-target w-full aspect-square text-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs" title="Smile">😊</button>
+          <button onclick="triggerAudienceReaction('😅')" class="touch-target w-full aspect-square text-xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs" title="Sweat Grin">😅</button>
+          <button onclick="triggerAudienceReaction('😂')" class="touch-target w-full aspect-square text-xl bg-yellow-50 hover:bg-yellow-100 border border-yellow-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs" title="Joy">😂</button>
+          <button onclick="triggerAudienceReaction('😇')" class="touch-target w-full aspect-square text-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs" title="Innocent">😇</button>
+          <button onclick="triggerAudienceReaction('🔥')" class="touch-target w-full aspect-square text-xl bg-orange-50 hover:bg-orange-100 border border-orange-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs" title="Fire">🔥</button>
+          <button onclick="triggerAudienceReaction('💯')" class="touch-target w-full aspect-square text-xl bg-red-50 hover:bg-red-100 border border-red-200/70 rounded-2xl transition transform active:scale-125 flex items-center justify-center shadow-2xs col-span-2 sm:col-span-1" title="100">💯</button>
+        </div>
+      </div>
+
+      <!-- MY SUBMISSIONS FEED (Deduplicated) -->
+      <div class="space-y-2 pt-1">
+        <div class="flex items-center justify-between font-telugu px-1">
+          <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <span>📜</span>
+            <span>మీరు పంపిన ఆలోచనలు</span>
+          </h4>
+          <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-mono font-bold" id="mySubmissionsCountBadge">
+            0
+          </span>
+        </div>
+
+        <div id="myThoughtsFeed" class="space-y-2">
+          <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-5 text-center text-slate-400 font-telugu text-xs">
+            మీరు ఇంకా ఎలాంటి ఆలోచనలను పంపలేదు. పైన టైప్ చేసి నిర్వాహకులకు పంపండి! ✍️
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Community Links & WhatsApp Share Button -->
+      <div class="grid grid-cols-1 gap-2 pt-1">
+        <button onclick="shareHallLinkWhatsApp()" class="touch-target bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl p-3 flex items-center justify-between gap-2.5 shadow-sm active:scale-[0.98] transition">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="text-xl">📲</span>
+            <p class="text-xs font-bold font-telugu truncate">ఈ సభ లింక్ మిత్రులకు WhatsApp లో పంపండి</p>
+          </div>
+          <span class="text-xs bg-white text-emerald-800 font-bold px-3 py-1.5 rounded-xl shrink-0">షేర్ చేయండి ↗</span>
+        </button>
+
+        <a href="https://chat.whatsapp.com/JzBx3z1nr5F0fOXi7YidNl?s=cl&p=a&ilr=4" target="_blank" rel="noopener noreferrer"
+           class="touch-target bg-white border border-emerald-200 rounded-2xl p-3 flex items-center justify-between gap-2.5 shadow-2xs">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center text-white shrink-0 shadow-2xs">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+            </div>
+            <p class="text-xs font-bold text-slate-800 font-telugu truncate">Join our WhatsApp Community</p>
+          </div>
+          <span class="text-xs bg-[#25D366] text-white font-bold px-3 py-1.5 rounded-xl shrink-0">Join ↗</span>
+        </a>
+
+        <a href="https://www.instagram.com/telugu_sahithi_samithi/" target="_blank" rel="noopener noreferrer"
+           class="touch-target bg-white border border-amber-200/80 rounded-2xl p-3 flex items-center justify-between gap-2.5 shadow-2xs">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#fd1d1d] to-[#833ab4] flex items-center justify-center text-white shrink-0 shadow-2xs">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </div>
+            <p class="text-xs font-bold text-slate-800 truncate">Follow us on instagram</p>
+          </div>
+          <span class="text-xs bg-slate-900 text-white font-bold px-3 py-1.5 rounded-xl shrink-0">Follow ↗</span>
+        </a>
+      </div>
+
+    </main>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 3. ADMIN PORTAL (RESPONSIVE: FOR ANDROID, iOS & LAPTOP) -->
+  <!-- ========================================================================= -->
+  <section id="adminScreen" class="hidden min-h-screen flex flex-col p-3 sm:p-5 lg:p-8 max-w-7xl mx-auto w-full transition-all duration-300 pt-14">
+    
+    <!-- Admin Header -->
+    <header class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-samithi-border flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-samithi-gold shadow-2xs shrink-0 logo-sync-target bg-white">
+          <img src="logo.jpg" alt="TSS" class="w-full h-full object-cover" onerror="if(typeof TSS_DEFAULT_LOGO !== 'undefined') this.src = TSS_DEFAULT_LOGO;" />
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-telugucalligraphy font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
+              నిర్వాహక వేదిక
+            </h1>
+            <span class="bg-amber-100 text-amber-800 text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full border border-amber-300 font-mono">
+              Live Hall Admin
+            </span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-slate-500 font-telugu">
+            తెలుగు సాహితి సమితి • 200+ సభ్యుల సభా నిర్వహణ నియంత్రణ
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons Toolbar -->
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Presentation Stage Button -->
+        <button onclick="openStagePresentationScreen()" class="touch-target flex-1 sm:flex-none px-3.5 py-2.5 bg-gradient-to-r from-samithi-gold to-amber-600 hover:from-amber-600 hover:to-samithi-gold text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5 active:scale-95">
+          <span>📽️ ప్రదర్శన తెర (Stage)</span>
+        </button>
+
+        <!-- Create Poll Button -->
+        <button onclick="openPollCreatorModal()" class="touch-target px-3 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
+          <span>📊 లైవ్ పోల్</span>
+        </button>
+
+        <!-- Broadcast Announcement -->
+        <button onclick="promptBroadcastAnnouncement()" class="touch-target px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
+          <span>📢 ప్రకటన</span>
+        </button>
+
+        <!-- Audience QR Code -->
+        <button onclick="openQrModal()" class="touch-target px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
+          <span>📲 QR</span>
+        </button>
+
+        <!-- Export Dropdown / Copy Button -->
+        <button onclick="copyAllThoughtsSummary()" class="touch-target px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1" title="పూర్తి నివేదిక కాపీ">
+          <span>📋 కాపీ</span>
+        </button>
+
+        <button onclick="exportToCsv()" class="touch-target px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1" title="CSV లోకి ఎక్స్‌పోర్ట్">
+          <span>📥 CSV</span>
+        </button>
+
+        <!-- Switch to Audience View -->
+        <button onclick="switchToAudienceView()" class="touch-target px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
+          <span>👥 ప్రేక్షక వేదిక</span>
+        </button>
+
+        <!-- Reset Hall Data -->
+        <button onclick="promptResetHallData()" class="touch-target p-2.5 text-rose-500 hover:bg-rose-50 rounded-xl transition flex items-center justify-center" title="సభ డేటా రీసెట్">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+        </button>
+
+        <!-- Logout Admin -->
+        <button onclick="logoutAdmin()" class="touch-target p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition flex items-center justify-center" title="నిష్క్రమించు">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Metrics Bar: Live Audience Interacting + Total Responses Received -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+      <div class="bg-white rounded-2xl p-4 border border-samithi-border shadow-2xs flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-500 font-telugu">ప్రత్యక్ష సభ్యులు (Live)</p>
+          <p id="adminMetricLive" class="text-2xl font-bold font-mono text-emerald-600 mt-0.5">1</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">👥</div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-samithi-border shadow-2xs flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-500 font-telugu">మొత్తం స్పందనలు (Responses)</p>
+          <p id="adminMetricTotal" class="text-2xl font-bold font-mono text-slate-900 mt-0.5">0</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-amber-50 text-samithi-gold flex items-center justify-center text-xl">💬</div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-samithi-border shadow-2xs flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-500 font-telugu">వేదికపై ఉన్నవి (Stage)</p>
+          <p id="adminMetricApproved" class="text-2xl font-bold font-mono text-amber-600 mt-0.5">0</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">📽️</div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-samithi-border shadow-2xs flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-500 font-telugu">నక్షత్రం (Starred)</p>
+          <p id="adminMetricStarred" class="text-2xl font-bold font-mono text-yellow-600 mt-0.5">0</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-xl">⭐</div>
+      </div>
+    </div>
+
+    <!-- Active Poll Controller in Admin -->
+    <div id="adminPollActiveCard" class="hidden mb-5 bg-gradient-to-r from-amber-500/10 via-amber-100/50 to-white rounded-2xl p-4 border border-amber-300 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-900 font-classic">ACTIVE AUDIENCE POLL</span>
+        </div>
+        <p id="adminActivePollTitle" class="font-telugucalligraphy font-bold text-slate-900 text-lg">పోల్ ప్రశ్న...</p>
+        <p id="adminActivePollVotesText" class="text-xs text-slate-500 font-mono">మొత్తం ఓట్లు: 0</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="closeCurrentPoll()" class="touch-target px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1">
+          <span>🛑 పోల్ ముగించు</span>
+        </button>
+        <button onclick="deleteCurrentPoll()" class="touch-target px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1">
+          <span>🗑️ తొలగించు</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="bg-white rounded-2xl p-3 border border-samithi-border shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-5">
+      <div class="flex items-center gap-2 flex-1 bg-slate-50 md:bg-transparent p-2 md:p-0 rounded-xl">
+        <span class="text-slate-400 pl-1">🔍</span>
+        <input 
+          type="text" 
+          id="adminSearchInput" 
+          placeholder="ఆలోచనలలో లేదా సభ్యుల పేరుతో లేదా విభాగంతో వెతకండి..."
+          class="w-full text-xs sm:text-sm bg-transparent border-none outline-none font-telugu placeholder:text-slate-400"
+          oninput="renderAdminFeed()"
+        />
+      </div>
+
+      <div class="flex items-center gap-1.5 text-xs font-telugu overflow-x-auto pb-1 md:pb-0">
+        <button onclick="setAdminFilter('all')" id="filterAllBtn" class="touch-target px-3 py-1.5 rounded-xl font-bold bg-samithi-navy text-white whitespace-nowrap">
+          అన్నీ (<span id="filterAllCount">0</span>)
+        </button>
+        <button onclick="setAdminFilter('approved')" id="filterApprovedBtn" class="touch-target px-3 py-1.5 rounded-xl font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap">
+          వేదికపై (<span id="filterApprovedCount">0</span>)
+        </button>
+        <button onclick="setAdminFilter('starred')" id="filterStarredBtn" class="touch-target px-3 py-1.5 rounded-xl font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap">
+          నక్షత్రం (<span id="filterStarredCount">0</span>)
+        </button>
+      </div>
+    </div>
+
+    <!-- The Pile of Thoughts Container (Clean, deduplicated) -->
+    <div id="adminThoughtsFeed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <!-- Thought cards populated dynamically -->
+    </div>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 4. AUDITORIUM STAGE PRESENTATION (DESIGNED EXCLUSIVELY FOR WINDOWS LAPTOPS & 16:9 PROJECTORS) -->
+  <!-- ========================================================================= -->
+  <section id="stagePresentationScreen" class="hidden fixed inset-0 z-40 bg-gradient-to-br from-[#060b14] via-samithi-deepnavy to-[#0a1120] text-white overflow-y-auto p-5 sm:p-8 lg:p-12 flex flex-col justify-between">
+    
+    <!-- Mobile Warning Banner (If opened on a mobile device instead of Windows laptop) -->
+    <div id="stageMobileNotice" class="hidden md:hidden mb-4 p-3 bg-amber-500/20 border border-amber-400/40 rounded-2xl text-amber-200 text-xs flex items-center justify-between gap-2">
+      <span>💡 గమనిక: ఈ ప్రదర్శన తెర Windows ల్యాప్‌టాప్ & ప్రొజెక్టర్ కోసం ప్రత్యేకంగా రూపొందించబడింది.</span>
+      <button onclick="switchToAudienceView()" class="px-2 py-1 bg-amber-400 text-slate-900 rounded-lg font-bold text-[11px] shrink-0">మొబైల్ వేదిక</button>
+    </div>
+
+    <!-- Stage Header (Projector Wide Format for Windows Laptop) -->
+    <header class="flex items-center justify-between pb-5 border-b border-samithi-gold/30">
+      <div class="flex items-center gap-3 sm:gap-5">
+        <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-samithi-gold shadow-2xl shrink-0 logo-sync-target bg-white">
+          <img src="logo.jpg" alt="TSS" class="w-full h-full object-cover" onerror="if(typeof TSS_DEFAULT_LOGO !== 'undefined') this.src = TSS_DEFAULT_LOGO;" />
+        </div>
+        <div>
+          <h1 class="font-telugucalligraphy font-bold text-2xl sm:text-4xl lg:text-5xl text-amber-200 leading-tight drop-shadow-md">
+            తెలుగు సాహితి సమితి
+          </h1>
+          <p class="font-classic text-[10px] sm:text-xs lg:text-sm text-samithi-gold font-bold tracking-[0.3em] uppercase mt-0.5 sm:mt-1">
+            ART IS HARMONY • ఆడిటోరియం ప్రదర్శన తెర (Stage)
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Live Interacting Audience Counter on Projector -->
+        <div class="bg-white/10 backdrop-blur-md border border-emerald-400/40 px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="font-telugu text-xs sm:text-sm lg:text-base font-bold text-emerald-200">
+            ప్రేక్షకులు: <span id="stageCounterLive" class="font-mono text-base sm:text-lg font-bold text-white">1</span>
+          </span>
+        </div>
+
+        <!-- Total Responses Counter on Projector -->
+        <div class="bg-white/10 backdrop-blur-md border border-amber-400/40 px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl flex items-center gap-2">
+          <span>💬</span>
+          <span class="font-telugu text-xs sm:text-sm lg:text-base font-bold text-amber-100">
+            స్పందనలు: <span id="stageCounterTotal" class="font-mono text-base sm:text-lg font-bold text-white">0</span>
+          </span>
+        </div>
+
+        <!-- Stage Approved Count -->
+        <div class="bg-white/10 backdrop-blur-md border border-samithi-gold/40 px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl flex items-center gap-2">
+          <span>📽️</span>
+          <span class="font-telugu text-xs sm:text-sm lg:text-base font-bold text-amber-100">
+            వేదికపై: <span id="stageCounterApproved" class="font-mono text-base sm:text-lg font-bold text-white">0</span>
+          </span>
+        </div>
+
+        <!-- Carousel Auto-Play Toggle -->
+        <button onclick="toggleStageCarousel()" id="stageCarouselToggleBtn" class="touch-target px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-xs font-bold text-amber-200 transition flex items-center gap-1.5" title="ఆటో-రొటేట్ కరౌసెల్ (Spacebar)">
+          <span id="stageCarouselIcon">▶️</span>
+          <span class="hidden sm:inline" id="stageCarouselLabel">ఆటో స్లైడ్</span>
+        </button>
+
+        <!-- Fullscreen Toggle Button -->
+        <button onclick="toggleFullscreen()" class="touch-target p-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl transition text-white flex items-center justify-center" title="పూర్తి తెర (F11)">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        </button>
+
+        <!-- Exit Stage Button -->
+        <button onclick="exitStagePresentationScreen()" class="touch-target p-2.5 bg-rose-500/20 hover:bg-rose-500/40 border border-rose-400/40 rounded-2xl transition text-rose-200 flex items-center justify-center" title="వేదిక నుండి వెనుకకు (Esc)">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Carousel Timer Progress Bar (Windows Laptop Auditorium Mode) -->
+    <div id="stageCarouselProgressBar" class="h-1 bg-amber-400/80 transition-all duration-100 w-0"></div>
+
+    <!-- Stage Content Feed: Grand High-Contrast Display for Long-Distance Auditorium Viewing -->
+    <main class="flex-1 py-6 sm:py-10 flex flex-col justify-center relative">
+      
+      <!-- Stage Live Poll Banner (if active) -->
+      <div id="stageLivePollBanner" class="hidden mb-6 max-w-4xl mx-auto w-full bg-gradient-to-r from-amber-500/20 via-white/10 to-amber-500/20 border-2 border-samithi-gold/60 rounded-3xl p-6 backdrop-blur-md animate-pop">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold text-amber-300 uppercase tracking-widest font-classic flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+            LIVE AUDITORIUM POLL RESULTS
+          </span>
+          <span id="stagePollTotalVotes" class="text-sm font-mono text-amber-200 font-bold">0 votes</span>
+        </div>
+        <h2 id="stagePollQuestionText" class="font-telugucalligraphy text-2xl sm:text-3xl text-amber-100 font-bold mb-4">
+          పోల్ ప్రశ్న...
+        </h2>
+        <div id="stagePollBarsContainer" class="space-y-3">
+          <!-- Dynamic live voting progress bars -->
+        </div>
+      </div>
+
+      <!-- Stage Thoughts Cards (Strictly Deduplicated) -->
+      <div id="stageThoughtsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto w-full">
+        <!-- Selective Thoughts Populated Here -->
+      </div>
+    </main>
+
+    <!-- Stage Projector Footer with Floating Onscreen QR Code badge & Windows Hotkeys Guide -->
+    <footer class="pt-4 border-t border-white/10 text-center font-telugu text-xs lg:text-sm text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div id="stageQrMini" class="w-12 h-12 bg-white p-1 rounded-lg cursor-pointer shadow hover:scale-105 transition" onclick="openQrModal()" title="సభలో చేరడానికి స్కాన్ చేయండి"></div>
+        <div class="text-left">
+          <p class="text-amber-300 font-bold text-xs">సభలో పాల్గొనడానికి స్కాన్ చేయండి</p>
+          <p class="text-[11px] text-slate-400">Android/iOS కెమెరాతో తక్షణ ప్రవేశం</p>
+        </div>
+      </div>
+
+      <!-- Windows Laptop Keyboard Shortcuts Bar -->
+      <div class="hidden lg:flex items-center gap-3 text-[11px] font-mono text-slate-400 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
+        <span>⌨️ Windows షార్ట్‌కట్స్:</span>
+        <span class="text-amber-200">[Space]: ఆటో-స్లైడ్</span>
+        <span class="text-amber-200">[➔ / ⬅]: స్లైడ్ మార్పు</span>
+        <span class="text-amber-200">[Q]: QR కోడ్</span>
+        <span class="text-amber-200">[F11]: పూర్తి తెర</span>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span>సభ్యులు పంపిన ఆలోచనలు • నిర్వాహకుల అనుమతితో వేదికపై ప్రదర్శించబడుతున్నవి</span>
+        <span class="font-classic text-amber-300 font-semibold tracking-wider">#TeluguSahithiSamithi</span>
+      </div>
+    </footer>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 5. DIALOGS & MODALS -->
+  <!-- ========================================================================= -->
+  <!-- QR Code Modal (For Audience & Projector) -->
+  <div id="qrModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border-2 border-samithi-gold animate-pop text-center">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-telugu font-bold text-slate-900 text-lg flex items-center gap-2">
+          <span>📲</span>
+          <span>సభలో పాల్గొనండి</span>
+        </h3>
+        <button onclick="closeQrModal()" class="touch-target text-slate-400 hover:text-slate-600 text-xl font-bold flex items-center justify-center">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-500 font-telugu mb-4">
+        ఆడిటోరియంలోని ప్రజలు తమ మొబైల్ కెమెరాతో (Android / iOS) ఈ కింది QR కోడ్‌ను స్కాన్ చేసి సభలోకి ప్రవేశించవచ్చు:
+      </p>
+
+      <div id="qrCodeContainer" class="flex justify-center p-4 bg-white border-2 border-slate-100 rounded-2xl shadow-inner mb-4"></div>
+
+      <div class="bg-slate-50 rounded-2xl p-2.5 mb-4 text-xs font-mono text-slate-700 break-all select-all border border-slate-200" id="qrDirectUrlText">
+        https://...
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="shareHallLinkWhatsApp()" class="touch-target w-1/2 py-2.5 rounded-xl bg-[#25D366] text-white text-xs font-bold font-telugu shadow-sm flex items-center justify-center gap-1">
+          <span>WhatsApp షేర్</span>
+        </button>
+        <button onclick="closeQrModal()" class="touch-target w-1/2 py-2.5 rounded-xl bg-slate-800 text-white text-xs font-bold font-telugu">
+          ముగించు
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Poll Creator Modal (Admin) -->
+  <div id="pollCreatorModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-samithi-gold animate-pop text-left">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-telugu font-bold text-slate-900 text-lg flex items-center gap-2">
+          <span>📊</span>
+          <span>కొత్త లైవ్ పోల్ సృష్టించండి</span>
+        </h3>
+        <button onclick="closePollCreatorModal()" class="touch-target text-slate-400 hover:text-slate-600 text-xl font-bold flex items-center justify-center">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-500 font-telugu mb-3">
+        సభలోని 200+ మంది సభ్యులు తమ ఫోన్ల నుండి తక్షణమే ఓటు వేసేలా పోల్ ప్రారంభించండి:
+      </p>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 font-telugu mb-1">పోల్ ప్రశ్న:</label>
+          <input 
+            type="text" 
+            id="pollQuestionInput" 
+            placeholder="ఉదా: ఈ నాటి కార్యక్రమంలో మీకు అత్యంత నచ్చిన అంశం ఏది?"
+            class="touch-target w-full px-4 py-2.5 bg-slate-50 border-2 border-slate-200 rounded-2xl text-sm font-telugu focus:border-samithi-gold outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 font-telugu mb-1">ఎంపికలు (Options):</label>
+          <div class="space-y-2" id="pollOptionsInputsContainer">
+            <input type="text" class="poll-option-input touch-target w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-telugu focus:border-samithi-gold outline-none" placeholder="ఎంపిక 1 (ఉదా: భావ కవిత్వం)" />
+            <input type="text" class="poll-option-input touch-target w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-telugu focus:border-samithi-gold outline-none" placeholder="ఎంపిక 2 (ఉదా: నాటక ప్రదర్శన)" />
+            <input type="text" class="poll-option-input touch-target w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-telugu focus:border-samithi-gold outline-none" placeholder="ఎంపిక 3 (ఉదా: గానం & సంగీతం)" />
+          </div>
+          <button type="button" onclick="addPollOptionField()" class="mt-2 text-xs text-samithi-golddark font-bold font-telugu flex items-center gap-1 hover:underline">
+            <span>+ మరొక ఎంపికను జోడించండి</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-4">
+        <button onclick="closePollCreatorModal()" class="touch-target w-1/3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 font-telugu">
+          రద్దు
+        </button>
+        <button onclick="launchLivePoll()" class="touch-target w-2/3 py-2.5 rounded-xl bg-gradient-to-r from-samithi-gold to-amber-600 text-white text-xs font-bold font-telugu shadow-md">
+          🚀 పోల్ ప్రారంభించు
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Authentication Modal (hemesh@123) -->
+  <div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-samithi-border animate-pop text-left">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-telugu font-bold text-slate-900 text-lg flex items-center gap-2">
+          <span>🔐</span>
+          <span>నిర్వాహక లాగిన్</span>
+        </h3>
+        <button onclick="closeAdminLoginModal()" class="touch-target text-slate-400 hover:text-slate-600 text-xl font-bold flex items-center justify-center">✕</button>
+      </div>
+      <p class="text-xs text-slate-500 font-telugu mb-3">
+        నిర్వాహక వేదికను చూడటానికి పాస్‌వర్డ్ నమోదు చేయండి.
+      </p>
+      <input 
+        type="password" 
+        id="adminPasswordInput" 
+        placeholder="పాస్‌వర్డ్ నమోదు చేయండి..."
+        class="touch-target w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-sm font-mono focus:border-samithi-gold outline-none mb-3"
+        onkeydown="if(event.key === 'Enter') verifyAdminLogin();"
+      />
+      <div id="adminAuthError" class="hidden text-xs text-rose-600 font-bold mb-3">
+        ⚠️ తప్పు పాస్‌వర్డ్! దయచేసి సరైన పాస్‌వర్డ్ ఇవ్వండి.
+      </div>
+      <div class="flex gap-2">
+        <button onclick="closeAdminLoginModal()" class="touch-target w-1/2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 font-telugu">
+          రద్దు
+        </button>
+        <button onclick="verifyAdminLogin()" class="touch-target w-1/2 py-2.5 rounded-xl bg-samithi-navy text-white text-xs font-bold hover:bg-slate-900 font-telugu shadow-sm">
+          ప్రవేశించు
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password-Protected Logo Management Modal -->
+  <div id="logoUploadModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-samithi-border animate-pop text-left">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-telugu font-bold text-slate-900 text-lg flex items-center gap-2">
+          <span>⚙️</span>
+          <span>లోగో సెట్టింగ్స్</span>
+        </h3>
+        <button onclick="closeLogoModal()" class="touch-target text-slate-400 hover:text-slate-600 text-xl font-bold flex items-center justify-center">✕</button>
+      </div>
+
+      <!-- Password Step -->
+      <div id="logoAuthStep" class="space-y-3">
+        <p class="text-xs text-slate-500 font-telugu">
+          లోగో మార్చడానికి దయచేసి నిర్వాహక పాస్‌వర్డ్ నమోదు చేయండి:
+        </p>
+        <input 
+          type="password" 
+          id="logoAdminPasswordInput" 
+          placeholder="పాస్‌వర్డ్ ఇవ్వండి..."
+          class="touch-target w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-sm font-mono focus:border-samithi-gold outline-none"
+          onkeydown="if(event.key === 'Enter') verifyLogoAdminPassword();"
+        />
+        <div id="logoAuthError" class="hidden text-xs text-rose-600 font-bold">
+          ⚠️ తప్పు పాస్‌వర్డ్!
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button onclick="closeLogoModal()" class="touch-target px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold font-telugu">రద్దు</button>
+          <button onclick="verifyLogoAdminPassword()" class="touch-target px-5 py-2 rounded-xl bg-samithi-navy text-white text-xs font-bold font-telugu">నిర్ధారించు</button>
+        </div>
+      </div>
+
+      <!-- Upload Controls Step -->
+      <div id="logoUploadControlsStep" class="hidden space-y-4">
+        <p class="text-xs text-slate-600 font-telugu">
+          మీ ఫోన్ లేదా ల్యాప్‌టాప్ నుండి అధికారిక లోగో చిత్రం (PNG / JPG) అప్‌లోడ్ చేయండి. ఇది అందరికీ తక్షణమే అప్‌డేట్ అవుతుంది.
+        </p>
+
+        <div class="flex items-center justify-center p-6 border-2 border-dashed border-slate-300 rounded-2xl hover:border-samithi-gold transition bg-slate-50 cursor-pointer" onclick="document.getElementById('logoFileInput').click()">
+          <input type="file" id="logoFileInput" accept="image/*" class="hidden" onchange="handleLogoFileUpload(event)" />
+          <div class="text-center space-y-2">
+            <span class="text-3xl">🖼️</span>
+            <p class="text-xs font-bold text-slate-700 font-telugu">చిత్రాన్ని ఎంచుకోవడానికి ఇక్కడ క్లిక్ చేయండి</p>
+            <p class="text-[10px] text-slate-400">PNG, JPG లేదా WEBP (గరిష్టంగా 3MB)</p>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between">
+          <button onclick="resetOfficialLogo()" class="text-xs text-rose-600 hover:underline font-bold font-telugu">
+            🔄 అధికారిక లోగోకి రీసెట్ చేయి
+          </button>
+          <button onclick="closeLogoModal()" class="touch-target px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold font-telugu">
+            పూర్తయింది
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spotlight Reader Modal -->
+  <div id="spotlightModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border-2 border-samithi-gold animate-pop text-left relative">
+      <button onclick="closeSpotlightModal()" class="touch-target absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-2xl font-bold flex items-center justify-center">✕</button>
+      
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-2xl">🔦</span>
+        <div>
+          <span class="text-xs font-bold text-samithi-gold uppercase tracking-wider font-classic">SPOTLIGHT VIEW</span>
+          <h4 id="spotlightAuthor" class="font-telugu font-bold text-lg text-slate-900">రచయిత</h4>
+        </div>
+      </div>
+
+      <div id="spotlightText" class="font-telugucalligraphy text-2xl sm:text-3xl text-slate-900 leading-relaxed py-4 border-y border-slate-100 my-2">
+        <!-- Spotlight content -->
+      </div>
+
+      <div class="flex items-center justify-between pt-3 text-xs text-slate-400 font-telugu">
+        <span id="spotlightTimestamp">సమయం</span>
+        <button onclick="closeSpotlightModal()" class="touch-target px-4 py-2 bg-slate-900 text-white rounded-xl font-bold font-telugu">
+          ముగించు
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: HIGH-SCALE REAL-TIME ARCHITECTURE & ANTI-DUPLICATE ENGINE -->
+  <!-- ========================================================================= -->
+  <script>
+    // -------------------------------------------------------------
+    // Application State Management
+    // -------------------------------------------------------------
+    const rawStoredThoughts = JSON.parse(localStorage.getItem('tss_thoughts_pile') || '[]');
+
+    const TSS_STATE = {
+      currentUser: localStorage.getItem('tss_user_name') || '',
+      isAdmin: false,
+      selectedCategory: 'సాధారణం',
+      thoughts: deduplicateThoughtsArray(rawStoredThoughts),
+      approvedPresentationIds: new Set(JSON.parse(localStorage.getItem('tss_approved_stage_ids') || '[]')),
+      starredIds: new Set(JSON.parse(localStorage.getItem('tss_starred_ids') || '[]')),
+      customLogo: localStorage.getItem('tss_custom_logo') || null,
+      adminFilter: 'all',
+      activePoll: JSON.parse(localStorage.getItem('tss_active_poll') || 'null'),
+      userVotedOption: localStorage.getItem('tss_user_voted_poll_option'),
+      announcement: null,
+      connectedParticipants: 1,
+      lastSubmitTime: 0,
+      clientId: 'c_' + Math.random().toString(36).substr(2, 9)
+    };
+
+    // Save cleaned deduplicated thoughts
+    localStorage.setItem('tss_thoughts_pile', JSON.stringify(TSS_STATE.thoughts));
+
+    // -------------------------------------------------------------
+    // STRICT ANTI-DUPLICATE ENGINE
+    // Guarantees zero duplicate cards appear across any network/device
+    // -------------------------------------------------------------
+    function deduplicateThoughtsArray(arr) {
+      if (!Array.isArray(arr)) return [];
+      const seenIds = new Set();
+      const seenContent = new Set();
+      const clean = [];
+
+      for (const item of arr) {
+        if (!item || !item.id || !item.text) continue;
+        const normalizedText = item.text.trim().toLowerCase();
+        const normalizedAuthor = (item.author || '').trim().toLowerCase();
+        const contentKey = `${normalizedAuthor}::${normalizedText}`;
+
+        if (seenIds.has(item.id) || seenContent.has(contentKey)) {
+          continue; // Skip duplicate
+        }
+
+        seenIds.add(item.id);
+        seenContent.add(contentKey);
+        clean.push(item);
+      }
+      return clean;
+    }
+
+    function isDuplicateSubmission(newThought, existingList) {
+      if (!newThought || !newThought.text) return true;
+      const targetText = newThought.text.trim().toLowerCase();
+      const targetAuthor = (newThought.author || '').trim().toLowerCase();
+
+      return existingList.some(t => {
+        if (t.id === newThought.id) return true;
+        const currText = (t.text || '').trim().toLowerCase();
+        const currAuthor = (t.author || '').trim().toLowerCase();
+        return (currText === targetText && currAuthor === targetAuthor);
+      });
+    }
+
+    // -------------------------------------------------------------
+    // High-Scale Multi-Network Cloud Synchronization (MQTT over WSS)
+    // Connects 200+ users across different cellular networks (Jio, Airtel, Wi-Fi)
+    // -------------------------------------------------------------
+    const ROOM_CODE = 'tss_hall_live_2026';
+    const TOPIC_PREFIX = `tss/auditorium/${ROOM_CODE}/`;
+    let mqttClient = null;
+    let localWs = null;
+    let isRealtimeConnected = false;
+
+    // Cross-tab broadcast channel for local multi-tab sync
+    const syncChannel = new BroadcastChannel('tss_hall_broadcast_channel');
+    syncChannel.onmessage = (event) => {
+      const { type, payload } = event.data;
+      handleSyncEvent(type, payload);
+    };
+
+    function initRealtimeSync() {
+      // 1. Try local WebSocket first if running on local node server
+      if (window.location.protocol.startsWith('http') && window.location.port === '3000') {
+        const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProto}//${window.location.host}`;
+        try {
+          localWs = new WebSocket(wsUrl);
+          localWs.onopen = () => {
+            console.log('[TSS] Connected to local WebSocket server');
+            isRealtimeConnected = true;
+            updateConnectionStatus(true, 'లైవ్ సర్వర్ కనెక్ట్ అయింది');
+          };
+          localWs.onmessage = (e) => {
+            try {
+              const msg = JSON.parse(e.data);
+              if (msg.type === 'INIT_STATE') {
+                if (msg.payload.thoughts) {
+                  TSS_STATE.thoughts = deduplicateThoughtsArray(msg.payload.thoughts);
+                }
+                if (msg.payload.approvedStageIds) TSS_STATE.approvedPresentationIds = new Set(msg.payload.approvedStageIds);
+                if (msg.payload.starredIds) TSS_STATE.starredIds = new Set(msg.payload.starredIds);
+                if (msg.payload.activePoll) TSS_STATE.activePoll = msg.payload.activePoll;
+                if (msg.payload.announcement) showGlobalAnnouncement(msg.payload.announcement);
+                if (msg.payload.connectedCount) updateParticipantCount(msg.payload.connectedCount);
+                syncCountersAndFeeds();
+              } else if (msg.type === 'PRESENCE_UPDATE') {
+                updateParticipantCount(msg.payload.connectedCount);
+              } else {
+                handleSyncEvent(msg.type, msg.payload);
+              }
+            } catch (err) {}
+          };
+          localWs.onerror = () => {
+            initCloudMqtt();
+          };
+          return;
+        } catch (e) {}
+      }
+
+      initCloudMqtt();
+    }
+
+    // Connects via Secure WebSockets (port 8884/443), seamlessly penetrating all mobile carrier firewalls
+    function initCloudMqtt() {
+      if (typeof mqtt === 'undefined') {
+        setTimeout(initCloudMqtt, 1000);
+        return;
+      }
+
+      const brokerList = [
+        'wss://broker.hivemq.com:8884/mqtt',
+        'wss://broker.emqx.io:8084/mqtt'
+      ];
+      const selectedBroker = brokerList[0];
+
+      try {
+        mqttClient = mqtt.connect(selectedBroker, {
+          clientId: TSS_STATE.clientId,
+          clean: true,
+          connectTimeout: 6000,
+          reconnectPeriod: 3000,
+          keepalive: 30
+        });
+
+        mqttClient.on('connect', () => {
+          isRealtimeConnected = true;
+          updateConnectionStatus(true, 'క్లౌడ్ లైవ్ కనెక్ట్ అయింది • 200+ వేదిక');
+
+          // Subscribe to hall topics
+          mqttClient.subscribe(`${TOPIC_PREFIX}#`, { qos: 0 });
+
+          // Announce presence heartbeat
+          sendPresencePing();
+          setInterval(sendPresencePing, 8000);
+        });
+
+        mqttClient.on('message', (topic, message) => {
+          try {
+            const raw = message.toString();
+            const data = JSON.parse(raw);
+            if (data.senderId !== TSS_STATE.clientId) {
+              handleSyncEvent(data.type, data.payload);
+            }
+          } catch (e) {}
+        });
+
+        mqttClient.on('reconnect', () => {
+          updateConnectionStatus(false, 'తిరిగి కనెక్ట్ అవుతోంది...');
+        });
+
+        mqttClient.on('offline', () => {
+          updateConnectionStatus(false, 'ఆఫ్‌లైన్ మోడ్');
+        });
+      } catch (err) {
+        console.warn('[TSS MQTT Error]', err);
+      }
+    }
+
+    const activeClientsMap = new Map();
+
+    function sendPresencePing() {
+      broadcastRealtime('PRESENCE_HEARTBEAT', {
+        clientId: TSS_STATE.clientId,
+        user: TSS_STATE.currentUser || 'సభ్యులు',
+        time: Date.now()
+      });
+    }
+
+    function updateParticipantCount(count) {
+      TSS_STATE.connectedParticipants = Math.max(1, count);
+      updateCountersDisplay();
+    }
+
+    function broadcastRealtime(type, payload) {
+      try {
+        syncChannel.postMessage({ type, payload });
+      } catch (e) {}
+
+      if (localWs && localWs.readyState === 1) {
+        try {
+          localWs.send(JSON.stringify({ type, payload }));
+        } catch (e) {}
+      }
+
+      if (mqttClient && mqttClient.connected) {
+        try {
+          const packet = JSON.stringify({
+            senderId: TSS_STATE.clientId,
+            type: type,
+            payload: payload
+          });
+          const topic = `${TOPIC_PREFIX}${type.toLowerCase()}`;
+          mqttClient.publish(topic, packet, { qos: 0 });
+        } catch (e) {}
+      }
+    }
+
+    function handleSyncEvent(type, payload) {
+      if (type === 'NEW_THOUGHT') {
+        if (!isDuplicateSubmission(payload, TSS_STATE.thoughts)) {
+          TSS_STATE.thoughts.unshift(payload);
+          TSS_STATE.thoughts = deduplicateThoughtsArray(TSS_STATE.thoughts);
+          if (TSS_STATE.thoughts.length > 500) TSS_STATE.thoughts.pop();
+          localStorage.setItem('tss_thoughts_pile', JSON.stringify(TSS_STATE.thoughts));
+          syncCountersAndFeeds();
+          playTone('pop');
+        }
+      } else if (type === 'EMOJI_REACTION') {
+        launchReactionParticle(payload.emoji, payload.count || 1);
+      } else if (type === 'STAGE_APPROVAL_UPDATE') {
+        TSS_STATE.approvedPresentationIds = new Set(payload.approvedIds);
+        localStorage.setItem('tss_approved_stage_ids', JSON.stringify([...TSS_STATE.approvedPresentationIds]));
+        syncCountersAndFeeds();
+      } else if (type === 'STAR_UPDATE') {
+        TSS_STATE.starredIds = new Set(payload.starredIds);
+        localStorage.setItem('tss_starred_ids', JSON.stringify([...TSS_STATE.starredIds]));
+        syncCountersAndFeeds();
+      } else if (type === 'THOUGHT_DELETED') {
+        TSS_STATE.thoughts = TSS_STATE.thoughts.filter(t => t.id !== payload.thoughtId);
+        TSS_STATE.approvedPresentationIds.delete(payload.thoughtId);
+        TSS_STATE.starredIds.delete(payload.thoughtId);
+        localStorage.setItem('tss_thoughts_pile', JSON.stringify(TSS_STATE.thoughts));
+        syncCountersAndFeeds();
+      } else if (type === 'THOUGHT_LIKE') {
+        const thought = TSS_STATE.thoughts.find(t => t.id === payload.thoughtId);
+        if (thought) {
+          thought.likes = payload.likes;
+          syncCountersAndFeeds();
+        }
+      } else if (type === 'POLL_UPDATE') {
+        TSS_STATE.activePoll = payload;
+        localStorage.setItem('tss_active_poll', JSON.stringify(payload));
+        renderAudiencePoll();
+        renderAdminActivePoll();
+        renderStagePoll();
+      } else if (type === 'ANNOUNCEMENT_UPDATE') {
+        showGlobalAnnouncement(payload);
+      } else if (type === 'RESET_HALL_DATA') {
+        TSS_STATE.thoughts = [];
+        TSS_STATE.approvedPresentationIds.clear();
+        TSS_STATE.starredIds.clear();
+        TSS_STATE.activePoll = null;
+        localStorage.removeItem('tss_thoughts_pile');
+        localStorage.removeItem('tss_approved_stage_ids');
+        localStorage.removeItem('tss_starred_ids');
+        localStorage.removeItem('tss_active_poll');
+        syncCountersAndFeeds();
+        renderAudiencePoll();
+        showToast('రీసెట్', 'సభ డేటా నిర్వాహకులచే రీసెట్ చేయబడింది.');
+      } else if (type === 'CUSTOM_LOGO_UPDATED') {
+        TSS_STATE.customLogo = payload.logoData;
+        applyLogoEverywhere();
+      } else if (type === 'PRESENCE_HEARTBEAT') {
+        activeClientsMap.set(payload.clientId, Date.now());
+        const now = Date.now();
+        for (const [id, time] of activeClientsMap.entries()) {
+          if (now - time > 20000) activeClientsMap.delete(id);
+        }
+        updateParticipantCount(Math.max(1, activeClientsMap.size));
+      }
+    }
+
+    function updateConnectionStatus(connected, text) {
+      const dot = document.getElementById('entryNetworkDot');
+      if (dot) {
+        dot.className = `w-2.5 h-2.5 rounded-full ${connected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`;
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Web Audio Synthesizer (Zero external audio file dependencies)
+    // -------------------------------------------------------------
+    let audioCtx = null;
+    function playTone(type) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'submit') {
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        } else if (type === 'pop') {
+          osc.frequency.setValueAtTime(360, now);
+          osc.frequency.exponentialRampToValueAtTime(840, now + 0.1);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'error') {
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        }
+      } catch (e) {}
+    }
+
+    // -------------------------------------------------------------
+    // Entry Screen & Mandatory Name Check
+    // -------------------------------------------------------------
+    function enterHall() {
+      const nameInput = document.getElementById('userNameInput');
+      const val = (nameInput.value || '').trim();
+      const alertBox = document.getElementById('nameValidationAlert');
+
+      if (!val) {
+        playTone('error');
+        nameInput.classList.remove('shake-error');
+        void nameInput.offsetWidth;
+        nameInput.classList.add('shake-error');
+        nameInput.classList.add('border-rose-500');
+        alertBox.classList.remove('hidden');
+        nameInput.focus();
+        return;
+      }
+
+      alertBox.classList.add('hidden');
+      nameInput.classList.remove('border-rose-500');
+      
+      TSS_STATE.currentUser = val;
+      localStorage.setItem('tss_user_name', val);
+
+      playTone('submit');
+      switchToAudienceView();
+      showToast('సాదర స్వాగతం!', `${val} గారు, తెలుగు సాహితి సమితి సభలోకి మీకు స్వాగతం.`);
+    }
+
+    function switchToAudienceView() {
+      document.getElementById('entryScreen').classList.add('hidden');
+      document.getElementById('adminScreen').classList.add('hidden');
+      document.getElementById('stagePresentationScreen').classList.add('hidden');
+      document.getElementById('audienceScreen').classList.remove('hidden');
+
+      document.getElementById('displayUserName').innerText = TSS_STATE.currentUser || 'సభ్యులు';
+      renderMySubmissions();
+      renderAudiencePoll();
+      updateCountersDisplay();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function leaveHall() {
+      document.getElementById('audienceScreen').classList.add('hidden');
+      document.getElementById('adminScreen').classList.add('hidden');
+      document.getElementById('entryScreen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // -------------------------------------------------------------
+    // Thought Submission Engine (With Strict Deduplication & Cooldown)
+    // -------------------------------------------------------------
+    function selectThoughtCategory(cat) {
+      TSS_STATE.selectedCategory = cat;
+      document.querySelectorAll('.category-pill').forEach(btn => {
+        if (btn.dataset.category === cat) {
+          btn.className = 'category-pill active px-3 py-1 rounded-xl font-bold bg-samithi-navy text-white text-[11px] whitespace-nowrap transition';
+        } else {
+          btn.className = 'category-pill px-3 py-1 rounded-xl font-bold bg-slate-100 text-slate-600 text-[11px] whitespace-nowrap transition';
+        }
+      });
+    }
+
+    function updateCharCount() {
+      const textarea = document.getElementById('thoughtInput');
+      const count = textarea.value.length;
+      document.getElementById('charCountLabel').innerText = `${count} / 300`;
+    }
+
+    function submitThoughtToHall() {
+      const now = Date.now();
+      if (now - TSS_STATE.lastSubmitTime < 3000) {
+        showToast('⏳ వేచి ఉండండి', 'కొద్ది సెకన్ల విరామం తర్వాత మరొక ఆలోచన పంపండి.');
+        return;
+      }
+
+      const textarea = document.getElementById('thoughtInput');
+      const text = textarea.value.trim();
+
+      if (!text) {
+        playTone('error');
+        textarea.classList.add('shake-error');
+        setTimeout(() => textarea.classList.remove('shake-error'), 450);
+        showToast('⚠️ ఖాళీగా ఉంది', 'దయచేసి మీ ఆలోచన లేదా కవితను నమోదు చేయండి.');
+        textarea.focus();
+        return;
+      }
+
+      const newThought = {
+        id: 't_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        author: TSS_STATE.currentUser || 'సభ్యులు',
+        category: TSS_STATE.selectedCategory || 'సాధారణం',
+        text: text,
+        timestamp: new Date().toLocaleTimeString('te-IN', { hour: '2-digit', minute: '2-digit' }),
+        likes: 0
+      };
+
+      // Strict Duplicate Check
+      if (isDuplicateSubmission(newThought, TSS_STATE.thoughts)) {
+        playTone('error');
+        showToast('⚠️ ఇప్పటికే ఉంది', 'ఈ ఆలోచన ఇప్పటికే సభలో సమర్పించబడింది (Duplicate skipped).');
+        return;
+      }
+
+      TSS_STATE.thoughts.unshift(newThought);
+      TSS_STATE.thoughts = deduplicateThoughtsArray(TSS_STATE.thoughts);
+      localStorage.setItem('tss_thoughts_pile', JSON.stringify(TSS_STATE.thoughts));
+      TSS_STATE.lastSubmitTime = now;
+
+      // Broadcast to all 200+ attendees in real time across networks
+      broadcastRealtime('NEW_THOUGHT', newThought);
+
+      textarea.value = '';
+      document.getElementById('charCountLabel').innerText = '0 / 300';
+
+      playTone('submit');
+      renderMySubmissions();
+      updateCountersDisplay();
+      showToast('✅ సమర్పించబడింది!', 'మీ ఆలోచన నిర్వాహకుల వద్దకు చేరింది.');
+      triggerAudienceReaction('✨');
+
+      // Visual cooldown on submit button
+      const btn = document.getElementById('publishThoughtBtn');
+      const btnLabel = document.getElementById('publishBtnText');
+      btn.disabled = true;
+      btn.classList.add('opacity-75');
+      btnLabel.innerText = 'సమర్పించబడింది ✓ (3s)';
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75');
+        btnLabel.innerText = 'సభకు పంపించండి (Submit Response)';
+      }, 3000);
+    }
+
+    function renderMySubmissions() {
+      const container = document.getElementById('myThoughtsFeed');
+      const countBadge = document.getElementById('mySubmissionsCountBadge');
+      
+      const cleanList = deduplicateThoughtsArray(TSS_STATE.thoughts);
+      const myThoughts = cleanList.filter(t => t.author === TSS_STATE.currentUser);
+      countBadge.innerText = myThoughts.length;
+
+      if (myThoughts.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-5 text-center text-slate-400 font-telugu text-xs">
+            మీరు ఇంకా ఎలాంటి ఆలోచనలను పంపలేదు. పైన టైప్ చేసి నిర్వాహకులకు పంపండి! ✍️
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = myThoughts.map(t => `
+        <div class="bg-white rounded-2xl p-3.5 border border-samithi-border shadow-2xs space-y-1.5 animate-pop">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-telugu">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="font-bold text-slate-700">మీరు</span>
+              <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-mono">${escapeHtml(t.category || 'సాధారణం')}</span>
+            </div>
+            <span class="font-mono">${t.timestamp}</span>
+          </div>
+          <p class="font-telugucalligraphy text-slate-900 text-base sm:text-lg leading-relaxed">
+            ${escapeHtml(t.text)}
+          </p>
+          <div class="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[11px] text-emerald-700 font-bold font-telugu">
+            <span class="flex items-center gap-1">✓ నిర్వాహకులకు చేరింది</span>
+            <div class="flex items-center gap-2">
+              ${(t.likes > 0) ? `<span class="text-rose-600 font-mono flex items-center gap-0.5">❤️ ${t.likes}</span>` : ''}
+              ${TSS_STATE.approvedPresentationIds.has(t.id) ? '<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-[10px]">📽️ వేదికపై ప్రదర్శనలో ఉంది</span>' : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // -------------------------------------------------------------
+    // High-Scale Reaction Engine (Burst Limiting & DOM Particle Pooling)
+    // -------------------------------------------------------------
+    let reactionBurstCount = 0;
+    let reactionFlushTimer = null;
+    let activeParticlesCount = 0;
+    const MAX_ONSCREEN_PARTICLES = 32;
+
+    function triggerAudienceReaction(emoji) {
+      playTone('pop');
+      if (navigator.vibrate) {
+        try { navigator.vibrate(15); } catch (e) {}
+      }
+
+      launchReactionParticle(emoji, 1);
+
+      reactionBurstCount++;
+      if (!reactionFlushTimer) {
+        reactionFlushTimer = setTimeout(() => {
+          broadcastRealtime('EMOJI_REACTION', { emoji: emoji, count: reactionBurstCount });
+          reactionBurstCount = 0;
+          reactionFlushTimer = null;
+        }, 280);
+      }
+    }
+
+    function launchReactionParticle(emoji, count = 1) {
+      if (activeParticlesCount >= MAX_ONSCREEN_PARTICLES) return;
+
+      const container = document.getElementById('floatingReactionsContainer');
+      const spawnCount = Math.min(count, 3);
+
+      for (let i = 0; i < spawnCount; i++) {
+        activeParticlesCount++;
+        const particle = document.createElement('div');
+        particle.className = 'reaction-particle text-3xl sm:text-4xl';
+        particle.innerText = emoji;
+
+        const randomX = Math.floor(Math.random() * 80) + 10;
+        const driftX = (Math.random() * 70 - 35) + 'px';
+        particle.style.left = `${randomX}vw`;
+        particle.style.bottom = `${15 + i * 10}px`;
+        particle.style.setProperty('--drift-x', driftX);
+
+        container.appendChild(particle);
+
+        setTimeout(() => {
+          if (particle.parentNode) particle.parentNode.removeChild(particle);
+          activeParticlesCount = Math.max(0, activeParticlesCount - 1);
+        }, 2450);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Live Audience Polling Engine
+    // -------------------------------------------------------------
+    function openPollCreatorModal() {
+      document.getElementById('pollQuestionInput').value = '';
+      document.getElementById('pollCreatorModal').classList.remove('hidden');
+    }
+
+    function closePollCreatorModal() {
+      document.getElementById('pollCreatorModal').classList.add('hidden');
+    }
+
+    function addPollOptionField() {
+      const container = document.getElementById('pollOptionsInputsContainer');
+      const count = container.querySelectorAll('input').length + 1;
+      if (count > 5) {
+        showToast('పరిమితి', 'గరిష్టంగా 5 ఎంపికలను మాత్రమే జోడించగలరు.');
+        return;
+      }
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'poll-option-input touch-target w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-telugu focus:border-samithi-gold outline-none animate-pop';
+      input.placeholder = `ఎంపిక ${count}`;
+      container.appendChild(input);
+    }
+
+    function launchLivePoll() {
+      const qInput = document.getElementById('pollQuestionInput');
+      const question = (qInput.value || '').trim();
+      const optionInputs = document.querySelectorAll('.poll-option-input');
+      
+      const options = [];
+      optionInputs.forEach(inp => {
+        const val = inp.value.trim();
+        if (val) options.push({ text: val, votes: 0 });
+      });
+
+      if (!question || options.length < 2) {
+        showToast('⚠️ లోపం', 'దయచేసి ప్రశ్న మరియు కనీసం 2 ఎంపికలు నమోదు చేయండి.');
+        return;
+      }
+
+      const pollData = {
+        id: 'poll_' + Date.now(),
+        question: question,
+        options: options,
+        totalVotes: 0,
+        isClosed: false,
+        createdTime: new Date().toLocaleTimeString('te-IN', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      TSS_STATE.activePoll = pollData;
+      TSS_STATE.userVotedOption = null;
+      localStorage.setItem('tss_active_poll', JSON.stringify(pollData));
+      localStorage.removeItem('tss_user_voted_poll_option');
+
+      broadcastRealtime('POLL_UPDATE', pollData);
+
+      closePollCreatorModal();
+      renderAudiencePoll();
+      renderAdminActivePoll();
+      renderStagePoll();
+      showToast('🚀 ప్రారంభమైంది!', 'లైవ్ పోల్ 200+ సభ్యుల తెరలపై ప్రత్యక్షంగా ప్రారంభమైంది.');
+
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+      }
+    }
+
+    function votePollOption(index) {
+      if (!TSS_STATE.activePoll || TSS_STATE.activePoll.isClosed) return;
+      if (TSS_STATE.userVotedOption !== null && TSS_STATE.userVotedOption !== undefined) {
+        showToast('గమనిక', 'మీరు ఇప్పటికే ఈ పోల్‌లో ఓటు వేశారు.');
+        return;
+      }
+
+      TSS_STATE.userVotedOption = index;
+      localStorage.setItem('tss_user_voted_poll_option', index);
+
+      TSS_STATE.activePoll.options[index].votes++;
+      TSS_STATE.activePoll.totalVotes++;
+      localStorage.setItem('tss_active_poll', JSON.stringify(TSS_STATE.activePoll));
+
+      broadcastRealtime('POLL_UPDATE', TSS_STATE.activePoll);
+
+      playTone('submit');
+      renderAudiencePoll();
+      renderAdminActivePoll();
+      renderStagePoll();
+      showToast('✓ ఓటు నమోదయింది', 'మీ అమూల్యమైన ఓటు విజయవంతంగా చేరింది!');
+      triggerAudienceReaction('👏');
+    }
+
+    function closeCurrentPoll() {
+      if (!TSS_STATE.activePoll) return;
+      TSS_STATE.activePoll.isClosed = true;
+      localStorage.setItem('tss_active_poll', JSON.stringify(TSS_STATE.activePoll));
+      broadcastRealtime('POLL_UPDATE', TSS_STATE.activePoll);
+      renderAudiencePoll();
+      renderAdminActivePoll();
+      renderStagePoll();
+      showToast('పోల్ ముగిసింది', 'లైవ్ ఓటింగ్ విజయవంతంగా ముగిసింది.');
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 120, spread: 80 });
+      }
+    }
+
+    function deleteCurrentPoll() {
+      if (!confirm('ఈ పోల్‌ను ఖచ్చితంగా తొలగించాలనుకుంటున్నారా?')) return;
+      TSS_STATE.activePoll = null;
+      TSS_STATE.userVotedOption = null;
+      localStorage.removeItem('tss_active_poll');
+      localStorage.removeItem('tss_user_voted_poll_option');
+      broadcastRealtime('POLL_UPDATE', null);
+      renderAudiencePoll();
+      renderAdminActivePoll();
+      renderStagePoll();
+      showToast('తొలగించబడింది', 'పోల్ తొలగించబడింది.');
+    }
+
+    function renderAudiencePoll() {
+      const container = document.getElementById('audiencePollContainer');
+      if (!container) return;
+
+      const poll = TSS_STATE.activePoll;
+      if (!poll) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      document.getElementById('audiencePollQuestion').innerText = poll.question;
+      
+      const statusBadge = document.getElementById('pollStatusBadge');
+      if (poll.isClosed) {
+        statusBadge.innerText = 'ఓటింగ్ ముగిసింది (ఫలితాలు)';
+        statusBadge.className = 'text-[11px] font-bold text-rose-700 font-telugu';
+      } else {
+        statusBadge.innerText = 'ఓటింగ్ ప్రారంభమైంది';
+        statusBadge.className = 'text-[11px] font-bold text-emerald-700 font-telugu';
+      }
+
+      const optionsHolder = document.getElementById('audiencePollOptions');
+      const hasVoted = (TSS_STATE.userVotedOption !== null && TSS_STATE.userVotedOption !== undefined);
+      const votedNotice = document.getElementById('pollVotedNotice');
+      if (hasVoted) votedNotice.classList.remove('hidden'); else votedNotice.classList.add('hidden');
+
+      optionsHolder.innerHTML = poll.options.map((opt, i) => {
+        const pct = poll.totalVotes > 0 ? Math.round((opt.votes / poll.totalVotes) * 100) : 0;
+        const isMyChoice = (hasVoted && parseInt(TSS_STATE.userVotedOption) === i);
+
+        return `
+          <button 
+            type="button"
+            onclick="${(!poll.isClosed && !hasVoted) ? `votePollOption(${i})` : ''}"
+            class="touch-target w-full text-left relative overflow-hidden rounded-2xl p-3 border-2 ${isMyChoice ? 'border-amber-500 bg-amber-500/10' : 'border-slate-200 bg-white hover:border-samithi-gold'} transition active:scale-[0.99] flex flex-col justify-between"
+            ${(poll.isClosed || hasVoted) ? 'disabled' : ''}>
+            
+            <div class="absolute inset-y-0 left-0 bg-amber-200/50 transition-width" style="width: ${hasVoted || poll.isClosed ? pct : 0}%;"></div>
+            
+            <div class="relative z-10 flex items-center justify-between text-xs font-bold text-slate-800 font-telugu">
+              <span class="flex items-center gap-1.5">
+                ${isMyChoice ? '<span>✓</span>' : ''}
+                <span>${escapeHtml(opt.text)}</span>
+              </span>
+              ${(hasVoted || poll.isClosed) ? `<span class="font-mono text-amber-900">${pct}% (${opt.votes})</span>` : '<span class="text-samithi-gold">ఓటు వేయండి ➔</span>'}
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderAdminActivePoll() {
+      const card = document.getElementById('adminPollActiveCard');
+      if (!card) return;
+
+      const poll = TSS_STATE.activePoll;
+      if (!poll) {
+        card.classList.add('hidden');
+        return;
+      }
+
+      card.classList.remove('hidden');
+      document.getElementById('adminActivePollTitle').innerText = poll.question;
+      document.getElementById('adminActivePollVotesText').innerText = `మొత్తం ఓట్లు: ${poll.totalVotes} • ${poll.isClosed ? 'ముగిసింది' : 'ప్రస్తుతం రన్ అవుతోంది'}`;
+    }
+
+    function renderStagePoll() {
+      const banner = document.getElementById('stageLivePollBanner');
+      if (!banner) return;
+
+      const poll = TSS_STATE.activePoll;
+      if (!poll) {
+        banner.classList.add('hidden');
+        return;
+      }
+
+      banner.classList.remove('hidden');
+      document.getElementById('stagePollQuestionText').innerText = poll.question;
+      document.getElementById('stagePollTotalVotes').innerText = `${poll.totalVotes} ఓట్లు సమర్పించబడ్డాయి`;
+
+      const container = document.getElementById('stagePollBarsContainer');
+      container.innerHTML = poll.options.map(opt => {
+        const pct = poll.totalVotes > 0 ? Math.round((opt.votes / poll.totalVotes) * 100) : 0;
+        return `
+          <div>
+            <div class="flex justify-between text-sm sm:text-base font-telugu font-bold text-amber-100 mb-1">
+              <span>${escapeHtml(opt.text)}</span>
+              <span class="font-mono text-amber-300">${pct}% (${opt.votes})</span>
+            </div>
+            <div class="h-3 bg-white/20 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-samithi-gold to-amber-400 rounded-full transition-width" style="width: ${pct}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // -------------------------------------------------------------
+    // Global Hall Announcement Banner (Admin Broadcast)
+    // -------------------------------------------------------------
+    function promptBroadcastAnnouncement() {
+      const msg = prompt('సభలోని 200+ మంది సభ్యుల ఫోన్లపై ప్రదర్శించడానికి ప్రకటన సందేశం ఇవ్వండి:');
+      if (!msg || !msg.trim()) return;
+
+      TSS_STATE.announcement = msg.trim();
+      broadcastRealtime('ANNOUNCEMENT_UPDATE', TSS_STATE.announcement);
+      showGlobalAnnouncement(TSS_STATE.announcement);
+      showToast('ప్రకటన పంపబడింది', 'అందరి ఫోన్లపైకి ప్రకటన చేరింది.');
+    }
+
+    function showGlobalAnnouncement(text) {
+      const banner = document.getElementById('globalAnnouncementBanner');
+      const label = document.getElementById('announcementText');
+      if (!banner || !label) return;
+
+      if (!text) {
+        banner.classList.add('hidden');
+        return;
+      }
+
+      label.innerText = text;
+      banner.classList.remove('hidden');
+      playTone('pop');
+    }
+
+    function dismissAnnouncement() {
+      document.getElementById('globalAnnouncementBanner').classList.add('hidden');
+    }
+
+    // -------------------------------------------------------------
+    // Admin Authentication (hemesh@123)
+    // -------------------------------------------------------------
+    function promptAdminLogin() {
+      document.getElementById('adminPasswordInput').value = '';
+      document.getElementById('adminAuthError').classList.add('hidden');
+      document.getElementById('adminLoginModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('adminPasswordInput').focus(), 100);
+    }
+
+    function closeAdminLoginModal() {
+      document.getElementById('adminLoginModal').classList.add('hidden');
+    }
+
+    function verifyAdminLogin() {
+      const pass = document.getElementById('adminPasswordInput').value;
+      if (pass === 'hemesh@123') {
+        TSS_STATE.isAdmin = true;
+        closeAdminLoginModal();
+        openAdminScreen();
+        showToast('స్వాగతం', 'నిర్వాహక వేదికలోకి విజయవంతంగా ప్రవేశించారు.');
+      } else {
+        playTone('error');
+        document.getElementById('adminAuthError').classList.remove('hidden');
+      }
+    }
+
+    function openAdminScreen() {
+      document.getElementById('entryScreen').classList.add('hidden');
+      document.getElementById('audienceScreen').classList.add('hidden');
+      document.getElementById('stagePresentationScreen').classList.add('hidden');
+      document.getElementById('adminScreen').classList.remove('hidden');
+
+      renderAdminFeed();
+      renderAdminActivePoll();
+      updateCountersDisplay();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function logoutAdmin() {
+      TSS_STATE.isAdmin = false;
+      document.getElementById('adminScreen').classList.add('hidden');
+      document.getElementById('entryScreen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // -------------------------------------------------------------
+    // Admin Pile Management & Deduplicated Feed
+    // -------------------------------------------------------------
+    function setAdminFilter(filter) {
+      TSS_STATE.adminFilter = filter;
+      ['all', 'approved', 'starred'].forEach(f => {
+        const btn = document.getElementById(`filter${capitalize(f)}Btn`);
+        if (btn) {
+          if (f === filter) {
+            btn.className = 'touch-target px-3 py-1.5 rounded-xl font-bold bg-samithi-navy text-white whitespace-nowrap';
+          } else {
+            btn.className = 'touch-target px-3 py-1.5 rounded-xl font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap';
+          }
+        }
+      });
+      renderAdminFeed();
+    }
+
+    function renderAdminFeed() {
+      const feed = document.getElementById('adminThoughtsFeed');
+      if (!feed) return;
+
+      const query = (document.getElementById('adminSearchInput')?.value || '').toLowerCase().trim();
+      const cleanThoughts = deduplicateThoughtsArray(TSS_STATE.thoughts);
+
+      let filtered = cleanThoughts.filter(t => {
+        const matchQuery = !query || 
+          t.text.toLowerCase().includes(query) || 
+          t.author.toLowerCase().includes(query) ||
+          (t.category && t.category.toLowerCase().includes(query));
+        if (!matchQuery) return false;
+
+        if (TSS_STATE.adminFilter === 'approved') return TSS_STATE.approvedPresentationIds.has(t.id);
+        if (TSS_STATE.adminFilter === 'starred') return TSS_STATE.starredIds.has(t.id);
+        return true;
+      });
+
+      document.getElementById('filterAllCount').innerText = cleanThoughts.length;
+      document.getElementById('filterApprovedCount').innerText = TSS_STATE.approvedPresentationIds.size;
+      document.getElementById('filterStarredCount').innerText = TSS_STATE.starredIds.size;
+
+      if (filtered.length === 0) {
+        feed.innerHTML = `
+          <div class="col-span-full bg-white border border-dashed border-slate-300 rounded-3xl p-8 text-center text-slate-400 font-telugu text-sm">
+            ఎలాంటి ఆలోచనలు కనిపించలేదు.
+          </div>
+        `;
+        return;
+      }
+
+      feed.innerHTML = filtered.map(t => {
+        const isApproved = TSS_STATE.approvedPresentationIds.has(t.id);
+        const isStarred = TSS_STATE.starredIds.has(t.id);
+
+        return `
+          <div class="bg-white rounded-3xl p-4 sm:p-5 border ${isApproved ? 'border-amber-400 ring-2 ring-amber-300/40' : 'border-samithi-border'} shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3 animate-pop">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 font-telugu mb-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-slate-800 text-sm">👤 ${escapeHtml(t.author)}</span>
+                  <span class="text-[10px] bg-amber-50 text-amber-800 px-2 py-0.5 rounded-md font-mono">${escapeHtml(t.category || 'సాధారణం')}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  ${(t.likes > 0) ? `<span class="text-rose-600 font-mono font-bold flex items-center gap-0.5">❤️ ${t.likes}</span>` : ''}
+                  <span class="font-mono">${t.timestamp}</span>
+                </div>
+              </div>
+              <p class="font-telugucalligraphy text-lg sm:text-xl text-slate-900 leading-relaxed">
+                ${escapeHtml(t.text)}
+              </p>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-1.5">
+              <button onclick="toggleShareToPresentation('${t.id}')" 
+                class="touch-target px-3 py-1.5 rounded-xl text-xs font-bold font-telugu transition flex items-center gap-1 ${isApproved ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
+                <span>📽️</span>
+                <span>${isApproved ? 'వేదికపై ఉంది ✓' : 'వేదికపై ప్రదర్శించు'}</span>
+              </button>
+
+              <div class="flex items-center gap-1">
+                <button onclick="toggleStarThought('${t.id}')" class="touch-target p-2 rounded-xl hover:bg-yellow-50 text-slate-400 hover:text-amber-500 transition text-sm ${isStarred ? 'text-amber-500 font-bold' : ''}" title="నక్షత్రం గుర్తు">
+                  ${isStarred ? '⭐' : '☆'}
+                </button>
+                <button onclick="openSpotlightModal('${t.id}')" class="touch-target p-2 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition text-sm" title="ముఖ్యాంశం">
+                  🔦
+                </button>
+                <button onclick="deleteThought('${t.id}')" class="touch-target p-2 rounded-xl hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition text-sm" title="తొలగించు">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleShareToPresentation(thoughtId) {
+      if (TSS_STATE.approvedPresentationIds.has(thoughtId)) {
+        TSS_STATE.approvedPresentationIds.delete(thoughtId);
+      } else {
+        TSS_STATE.approvedPresentationIds.add(thoughtId);
+        playTone('pop');
+      }
+
+      localStorage.setItem('tss_approved_stage_ids', JSON.stringify([...TSS_STATE.approvedPresentationIds]));
+      broadcastRealtime('STAGE_APPROVAL_UPDATE', { approvedIds: [...TSS_STATE.approvedPresentationIds] });
+
+      renderAdminFeed();
+      renderStageFeed();
+      updateCountersDisplay();
+    }
+
+    function toggleStarThought(thoughtId) {
+      if (TSS_STATE.starredIds.has(thoughtId)) {
+        TSS_STATE.starredIds.delete(thoughtId);
+      } else {
+        TSS_STATE.starredIds.add(thoughtId);
+      }
+      localStorage.setItem('tss_starred_ids', JSON.stringify([...TSS_STATE.starredIds]));
+      broadcastRealtime('STAR_UPDATE', { starredIds: [...TSS_STATE.starredIds] });
+      renderAdminFeed();
+      updateCountersDisplay();
+    }
+
+    function deleteThought(thoughtId) {
+      if (!confirm('ఈ ఆలోచనను ఖచ్చితంగా తొలగించాలనుకుంటున్నారా?')) return;
+      TSS_STATE.thoughts = TSS_STATE.thoughts.filter(t => t.id !== thoughtId);
+      TSS_STATE.approvedPresentationIds.delete(thoughtId);
+      TSS_STATE.starredIds.delete(thoughtId);
+
+      localStorage.setItem('tss_thoughts_pile', JSON.stringify(TSS_STATE.thoughts));
+      localStorage.setItem('tss_approved_stage_ids', JSON.stringify([...TSS_STATE.approvedPresentationIds]));
+      localStorage.setItem('tss_starred_ids', JSON.stringify([...TSS_STATE.starredIds]));
+
+      broadcastRealtime('THOUGHT_DELETED', { thoughtId });
+
+      renderAdminFeed();
+      renderStageFeed();
+      renderMySubmissions();
+      updateCountersDisplay();
+      showToast('తొలగించబడింది', 'ఆలోచన తొలగించబడింది.');
+    }
+
+    function copyAllThoughtsSummary() {
+      const cleanList = deduplicateThoughtsArray(TSS_STATE.thoughts);
+      if (cleanList.length === 0) {
+        showToast('సమాచారం లేదు', 'కాపీ చేయడానికి ఆలోచనలు ఏవీ లేవు.');
+        return;
+      }
+
+      let report = `తెలుగు సాహితి సమితి - సభా నివేదిక\n`;
+      report += `ART IS HARMONY • Developed by Nalluru Hemesh, Head of KALAM cluster, TSS\n`;
+      report += `తేదీ: ${new Date().toLocaleDateString('te-IN')}\n`;
+      report += `ప్రత్యక్ష సభ్యులు: ${TSS_STATE.connectedParticipants}\n`;
+      report += `మొత్తం స్పందనలు: ${cleanList.length}\n`;
+      report += `వేదికపై ప్రదర్శించినవి: ${TSS_STATE.approvedPresentationIds.size}\n`;
+      report += `-----------------------------------------------------------\n\n`;
+
+      cleanList.forEach((t, i) => {
+        report += `${i + 1}. [${t.author}] (${t.category || 'సాధారణం'} - ${t.timestamp}):\n"${t.text}"\n\n`;
+      });
+
+      const tempArea = document.createElement('textarea');
+      tempArea.value = report;
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempArea);
+
+      showToast('📋 కాపీ చేయబడింది!', 'అన్ని ఆలోచనల నివేదిక క్లిప్‌బోర్డ్‌కి కాపీ చేయబడింది.');
+    }
+
+    function exportToCsv() {
+      const cleanList = deduplicateThoughtsArray(TSS_STATE.thoughts);
+      if (cleanList.length === 0) {
+        showToast('సమాచారం లేదు', 'ఎక్స్‌పోర్ట్ చేయడానికి ఆలోచనలు ఏవీ లేవు.');
+        return;
+      }
+
+      let csv = 'క్రమ సంఖ్య,రచయిత,విభాగం,సమయం,ఆలోచన / కవిత,స్టేజ్ ఆమోదం,నక్షత్రం,లైకులు\n';
+      cleanList.forEach((t, i) => {
+        const isApp = TSS_STATE.approvedPresentationIds.has(t.id) ? 'అవును' : 'కాదు';
+        const isStar = TSS_STATE.starredIds.has(t.id) ? 'అవును' : 'కాదు';
+        const cleanText = `"${(t.text || '').replace(/"/g, '""')}"`;
+        csv += `${i + 1},"${t.author}","${t.category || 'సాధారణం'}","${t.timestamp}",${cleanText},${isApp},${isStar},${t.likes || 0}\n`;
+      });
+
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `TSS_Hall_Thoughts_${Date.now()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('📥 డౌన్‌లోడ్ అయింది', 'CSV ఫైల్ విజయవంతంగా డౌన్‌లోడ్ చేయబడింది.');
+    }
+
+    function promptResetHallData() {
+      const pass = prompt('సభ మొత్తం ఆలోచనలు & పోల్స్ రీసెట్ చేయడానికి నిర్వాహక పాస్‌వర్డ్ ఇవ్వండి:');
+      if (pass !== 'hemesh@123') {
+        if (pass !== null) alert('తప్పు పాస్‌వర్డ్!');
+        return;
+      }
+
+      if (confirm('ఖచ్చితంగా మొత్తం సభా సమాచారాన్ని రీసెట్ చేయాలనుకుంటున్నారా?')) {
+        TSS_STATE.thoughts = [];
+        TSS_STATE.approvedPresentationIds.clear();
+        TSS_STATE.starredIds.clear();
+        TSS_STATE.activePoll = null;
+        localStorage.removeItem('tss_thoughts_pile');
+        localStorage.removeItem('tss_approved_stage_ids');
+        localStorage.removeItem('tss_starred_ids');
+        localStorage.removeItem('tss_active_poll');
+
+        broadcastRealtime('RESET_HALL_DATA', {});
+        syncCountersAndFeeds();
+        renderAdminActivePoll();
+        renderStagePoll();
+        showToast('రీసెట్ పూర్తయింది', 'సభా వేదిక నూతన సెషన్ కోసం సిద్ధం చేయబడింది.');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Stage Presentation Screen (Exclusively for Windows Laptop & Projector)
+    // -------------------------------------------------------------
+    let stageCarouselInterval = null;
+    let stageCurrentIndex = 0;
+
+    function openStagePresentationScreen() {
+      // Check device screen width
+      if (window.innerWidth < 768) {
+        const notice = document.getElementById('stageMobileNotice');
+        if (notice) notice.classList.remove('hidden');
+      }
+
+      document.getElementById('adminScreen').classList.add('hidden');
+      document.getElementById('audienceScreen').classList.add('hidden');
+      document.getElementById('entryScreen').classList.add('hidden');
+      document.getElementById('stagePresentationScreen').classList.remove('hidden');
+
+      renderStageFeed();
+      renderStagePoll();
+      updateCountersDisplay();
+      generateStageMiniQr();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function exitStagePresentationScreen() {
+      if (stageCarouselInterval) toggleStageCarousel();
+      document.getElementById('stagePresentationScreen').classList.add('hidden');
+      if (TSS_STATE.isAdmin) {
+        document.getElementById('adminScreen').classList.remove('hidden');
+      } else {
+        document.getElementById('entryScreen').classList.remove('hidden');
+      }
+    }
+
+    function renderStageFeed() {
+      const grid = document.getElementById('stageThoughtsGrid');
+      if (!grid) return;
+
+      const cleanList = deduplicateThoughtsArray(TSS_STATE.thoughts);
+      const approved = cleanList.filter(t => TSS_STATE.approvedPresentationIds.has(t.id));
+      document.getElementById('stageCounterApproved').innerText = approved.length;
+
+      if (approved.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center space-y-4">
+            <span class="text-6xl">📽️</span>
+            <h3 class="font-telugucalligraphy text-3xl lg:text-4xl text-amber-200">
+              ప్రదర్శన కోసం ఆలోచనలు ఇంకా ఎంపిక చేయబడలేదు
+            </h3>
+            <p class="text-base text-slate-400 font-telugu max-w-lg mx-auto">
+              సభలోని సభ్యులు పంపిన ఆలోచనలను నిర్వాహకులు ఆమోదించిన వెంటనే ఇక్కడ ఆడిటోరియం వేదికపై ప్రదర్శించబడతాయి.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = approved.map((t, idx) => `
+        <div class="stage-card bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-md rounded-3xl p-6 lg:p-8 border border-samithi-gold/40 shadow-2xl flex flex-col justify-between space-y-5 animate-pop ${idx === stageCurrentIndex ? 'ring-2 ring-amber-400/80 shadow-amber-500/20' : ''}">
+          <div>
+            <div class="flex items-center justify-between text-xs text-amber-300/80 mb-3 font-mono">
+              <span class="bg-amber-400/20 px-2.5 py-0.5 rounded-full border border-amber-400/30">${escapeHtml(t.category || 'సాధారణం')}</span>
+              <span>${t.timestamp}</span>
+            </div>
+            <p class="font-telugucalligraphy text-2xl lg:text-3xl text-amber-50 leading-relaxed tracking-wide">
+              "${escapeHtml(t.text)}"
+            </p>
+          </div>
+          <div class="pt-4 border-t border-white/10 flex items-center justify-between text-sm lg:text-base font-telugu text-amber-300">
+            <span class="font-bold flex items-center gap-2">
+              <span>✍️</span>
+              <span>${escapeHtml(t.author)}</span>
+            </span>
+            ${t.likes > 0 ? `<span class="text-rose-400 font-mono font-bold">❤️ ${t.likes}</span>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleStageCarousel() {
+      const btn = document.getElementById('stageCarouselToggleBtn');
+      const icon = document.getElementById('stageCarouselIcon');
+      const label = document.getElementById('stageCarouselLabel');
+      const progressBar = document.getElementById('stageCarouselProgressBar');
+
+      if (stageCarouselInterval) {
+        clearInterval(stageCarouselInterval);
+        stageCarouselInterval = null;
+        icon.innerText = '▶️';
+        label.innerText = 'ఆటో స్లైడ్';
+        progressBar.style.width = '0%';
+      } else {
+        icon.innerText = '⏸️';
+        label.innerText = 'ఆపు';
+        advanceStageCarousel();
+        stageCarouselInterval = setInterval(advanceStageCarousel, 10000);
+      }
+    }
+
+    function advanceStageCarousel(direction = 1) {
+      const cleanList = deduplicateThoughtsArray(TSS_STATE.thoughts);
+      const approved = cleanList.filter(t => TSS_STATE.approvedPresentationIds.has(t.id));
+      if (approved.length === 0) return;
+
+      if (direction === 1) {
+        stageCurrentIndex = (stageCurrentIndex + 1) % approved.length;
+      } else {
+        stageCurrentIndex = (stageCurrentIndex - 1 + approved.length) % approved.length;
+      }
+      renderStageFeed();
+
+      const progressBar = document.getElementById('stageCarouselProgressBar');
+      if (progressBar) {
+        progressBar.style.transition = 'none';
+        progressBar.style.width = '0%';
+        setTimeout(() => {
+          progressBar.style.transition = 'width 9.8s linear';
+          progressBar.style.width = '100%';
+        }, 50);
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    // Windows Laptop Auditorium Keyboard Hotkeys
+    window.addEventListener('keydown', (e) => {
+      const stage = document.getElementById('stagePresentationScreen');
+      if (!stage.classList.contains('hidden')) {
+        if (e.key === 'ArrowRight') advanceStageCarousel(1);
+        if (e.key === 'ArrowLeft') advanceStageCarousel(-1);
+        if (e.key === ' ') { e.preventDefault(); toggleStageCarousel(); }
+        if (e.key === 'q' || e.key === 'Q') openQrModal();
+        if (e.key === 'Escape') exitStagePresentationScreen();
+      }
+    });
+
+    // -------------------------------------------------------------
+    // QR Code Generator (Audience Onboarding Across Networks)
+    // -------------------------------------------------------------
+    function openQrModal() {
+      const container = document.getElementById('qrCodeContainer');
+      container.innerHTML = '';
+      
+      const currentUrl = window.location.href.split('#')[0];
+      document.getElementById('qrDirectUrlText').innerText = currentUrl;
+
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(container, {
+          text: currentUrl,
+          width: 200,
+          height: 200,
+          colorDark: "#18233e",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } else {
+        container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}" alt="QR Code" class="w-48 h-48" />`;
+      }
+
+      document.getElementById('qrModal').classList.remove('hidden');
+    }
+
+    function closeQrModal() {
+      document.getElementById('qrModal').classList.add('hidden');
+    }
+
+    function generateStageMiniQr() {
+      const container = document.getElementById('stageQrMini');
+      if (!container) return;
+      container.innerHTML = '';
+      const currentUrl = window.location.href.split('#')[0];
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(container, {
+          text: currentUrl,
+          width: 44,
+          height: 44,
+          colorDark: "#0b1324",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.L
+        });
+      }
+    }
+
+    function shareHallLinkWhatsApp() {
+      const currentUrl = window.location.href.split('#')[0];
+      const msg = `నమస్కారం! తెలుగు సాహితి సమితి ప్రత్యక్ష సభా వేదికలో పాల్గొనండి. మీ ఆలోచనలు & కవితలను పంచుకోవడానికి ఈ లింక్ ద్వారా ప్రవేశించండి: ${currentUrl}\n\n(Developed by Nalluru Hemesh, Head of KALAM cluster, TSS)`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    // -------------------------------------------------------------
+    // Spotlight Reader
+    // -------------------------------------------------------------
+    function openSpotlightModal(thoughtId) {
+      const thought = TSS_STATE.thoughts.find(t => t.id === thoughtId);
+      if (!thought) return;
+
+      document.getElementById('spotlightAuthor').innerText = `${thought.author} (${thought.category || 'సాధారణం'})`;
+      document.getElementById('spotlightText').innerText = `"${thought.text}"`;
+      document.getElementById('spotlightTimestamp').innerText = `సమయం: ${thought.timestamp}`;
+      document.getElementById('spotlightModal').classList.remove('hidden');
+    }
+
+    function closeSpotlightModal() {
+      document.getElementById('spotlightModal').classList.add('hidden');
+    }
+
+    // -------------------------------------------------------------
+    // Official Logo Management & Replacement (hemesh@123)
+    // -------------------------------------------------------------
+    function promptLogoSettings() {
+      document.getElementById('logoAdminPasswordInput').value = '';
+      document.getElementById('logoAuthError').classList.add('hidden');
+      document.getElementById('logoAuthStep').classList.remove('hidden');
+      document.getElementById('logoUploadControlsStep').classList.add('hidden');
+      document.getElementById('logoUploadModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('logoAdminPasswordInput').focus(), 100);
+    }
+
+    function closeLogoModal() {
+      document.getElementById('logoUploadModal').classList.add('hidden');
+    }
+
+    function verifyLogoAdminPassword() {
+      const pass = document.getElementById('logoAdminPasswordInput').value;
+      if (pass === 'hemesh@123') {
+        document.getElementById('logoAuthStep').classList.add('hidden');
+        document.getElementById('logoUploadControlsStep').classList.remove('hidden');
+      } else {
+        playTone('error');
+        document.getElementById('logoAuthError').classList.remove('hidden');
+      }
+    }
+
+    function handleLogoFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.size > 3 * 1024 * 1024) {
+        alert('చిత్రం పరిమాణం 3MB కన్నా తక్కువగా ఉండాలి.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result;
+        TSS_STATE.customLogo = base64Data;
+        localStorage.setItem('tss_custom_logo', base64Data);
+
+        applyLogoEverywhere();
+        broadcastRealtime('CUSTOM_LOGO_UPDATED', { logoData: base64Data });
+        showToast('లోగో అప్‌డేట్ అయింది', 'కొత్త లోగో విజయవంతంగా భద్రపరచబడింది.');
+        closeLogoModal();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetOfficialLogo() {
+      TSS_STATE.customLogo = null;
+      localStorage.removeItem('tss_custom_logo');
+
+      applyLogoEverywhere();
+      broadcastRealtime('CUSTOM_LOGO_UPDATED', { logoData: null });
+      showToast('రీసెట్ చేయబడింది', 'అధికారిక లోగో పునరుద్ధరించబడింది.');
+      closeLogoModal();
+    }
+
+    function getOfficialLogoSrc() {
+      if (TSS_STATE.customLogo) return TSS_STATE.customLogo;
+      if (typeof TSS_DEFAULT_LOGO !== 'undefined') return TSS_DEFAULT_LOGO;
+      return 'logo.jpg';
+    }
+
+    function applyLogoEverywhere() {
+      const logoSrc = getOfficialLogoSrc();
+      const targets = document.querySelectorAll('.logo-sync-target');
+      targets.forEach(container => {
+        container.innerHTML = `<img src="${logoSrc}" alt="తెలుగు సాహితి సమితి" class="w-full h-full object-cover rounded-full" onerror="if(typeof TSS_DEFAULT_LOGO !== 'undefined') this.src = TSS_DEFAULT_LOGO;">`;
+      });
+
+      const entryImg = document.getElementById('entryLogoImg');
+      if (entryImg) {
+        entryImg.src = logoSrc;
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Dynamic Real-Time Counters (Live Audience & Total Responses)
+    // -------------------------------------------------------------
+    function updateCountersDisplay() {
+      const cleanThoughts = deduplicateThoughtsArray(TSS_STATE.thoughts);
+      const totalResponses = cleanThoughts.length;
+      const approvedCount = TSS_STATE.approvedPresentationIds.size;
+      const starredCount = TSS_STATE.starredIds.size;
+      const liveAudience = TSS_STATE.connectedParticipants;
+
+      // 1. Entry Screen
+      const entryAud = document.getElementById('entryLiveAudienceCount');
+      if (entryAud) entryAud.innerText = liveAudience;
+      const entryResp = document.getElementById('entryLiveResponsesCount');
+      if (entryResp) entryResp.innerText = totalResponses;
+
+      // 2. Audience Screen Header
+      const audCounter = document.getElementById('audienceTotalCounter');
+      if (audCounter) audCounter.innerText = totalResponses;
+      const liveCounter = document.getElementById('liveParticipantsCounter');
+      if (liveCounter) liveCounter.innerText = liveAudience;
+
+      // 3. Admin Metrics
+      const adminLive = document.getElementById('adminMetricLive');
+      if (adminLive) adminLive.innerText = liveAudience;
+      const adminTotal = document.getElementById('adminMetricTotal');
+      if (adminTotal) adminTotal.innerText = totalResponses;
+      const adminAppr = document.getElementById('adminMetricApproved');
+      if (adminAppr) adminAppr.innerText = approvedCount;
+      const adminStar = document.getElementById('adminMetricStarred');
+      if (adminStar) adminStar.innerText = starredCount;
+
+      // 4. Stage Presentation Screen (Windows Laptop)
+      const stageLive = document.getElementById('stageCounterLive');
+      if (stageLive) stageLive.innerText = liveAudience;
+      const stageTotal = document.getElementById('stageCounterTotal');
+      if (stageTotal) stageTotal.innerText = totalResponses;
+      const stageAppr = document.getElementById('stageCounterApproved');
+      if (stageAppr) stageAppr.innerText = approvedCount;
+    }
+
+    function syncCountersAndFeeds() {
+      updateCountersDisplay();
+      renderMySubmissions();
+      if (!document.getElementById('adminScreen').classList.contains('hidden')) {
+        renderAdminFeed();
+      }
+      if (!document.getElementById('stagePresentationScreen').classList.contains('hidden')) {
+        renderStageFeed();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Toast Notification System & Utilities
+    // -------------------------------------------------------------
+    function showToast(title, msg) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'bg-slate-900/95 text-white p-3.5 rounded-2xl shadow-xl border border-samithi-gold/40 text-xs font-telugu flex items-start gap-2.5 animate-pop pointer-events-auto backdrop-blur-md';
+      toast.innerHTML = `
+        <span class="text-base text-amber-300">✨</span>
+        <div class="flex-1">
+          <p class="font-bold text-amber-100">${escapeHtml(title)}</p>
+          <p class="text-slate-300 mt-0.5">${escapeHtml(msg)}</p>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function capitalize(str) {
+      if (!str) return '';
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // Initialize application on window load
+    window.addEventListener('DOMContentLoaded', () => {
+      applyLogoEverywhere();
+      updateCountersDisplay();
+      initRealtimeSync();
+
+      if (TSS_STATE.currentUser) {
+        const input = document.getElementById('userNameInput');
+        if (input) input.value = TSS_STATE.currentUser;
+      }
+    });
+  </script>
+</body>
+</html>
